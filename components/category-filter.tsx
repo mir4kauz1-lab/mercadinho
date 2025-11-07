@@ -41,11 +41,12 @@ export function CategoryFilter({ categories, selectedCategory, onSelectCategory 
 const styles = StyleSheet.create({
   scroll: {
     flexGrow: 0,
+    height: 64,
   },
   container: {
     paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 8,
+    paddingTop: 6,
+    paddingBottom: 4,
     flexDirection: 'row',
     alignItems: 'center',
   },

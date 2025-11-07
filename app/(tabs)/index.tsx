@@ -1,3 +1,4 @@
+import { BOTTOM_NAV_HEIGHT, BottomNavigation } from '@/components/bottom-navigation';
 import { CategoryFilter } from '@/components/category-filter';
 import { ProductCard } from '@/components/product-card';
 import { Ionicons } from '@expo/vector-icons';
@@ -96,31 +97,7 @@ export default function HomeScreen() {
         <View style={styles.bottomSpacer} />
       </ScrollView>
 
-      <View style={styles.bottomNavContainer}>
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="home" size={24} color="#FFF" />
-            <Text style={styles.navLabelActive}>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="pricetag-outline" size={24} color="#E0D4FF" />
-            <Text style={styles.navLabel}>Ofertas</Text>
-          </TouchableOpacity>
-          <View style={styles.fabSpace} />
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="chatbubble-ellipses-outline" size={24} color="#E0D4FF" />
-            <Text style={styles.navLabel}>Chat</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="heart-outline" size={24} color="#E0D4FF" />
-            <Text style={styles.navLabel}>Favoritos</Text>
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity style={styles.fab}>
-          <Ionicons name="add" size={32} color="#7C3AED" />
-        </TouchableOpacity>
-      </View>
+      <BottomNavigation active="home" />
     </View>
   );
 }
@@ -188,7 +165,7 @@ const styles = StyleSheet.create({
   productsContent: {
     paddingHorizontal: 20,
     paddingTop: 0,
-    paddingBottom: 120,
+    paddingBottom: BOTTOM_NAV_HEIGHT,
   },
   productsGrid: {
     flexDirection: 'row',
@@ -197,65 +174,5 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 16,
-  },
-  bottomNavContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    paddingBottom: 8,
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    backgroundColor: '#7C3AED',
-    marginHorizontal: 0,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    width: '90%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    elevation: 12,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-  },
-  navLabel: {
-    fontSize: 11,
-    color: '#E0D4FF',
-    fontWeight: '500',
-  },
-  navLabelActive: {
-    fontSize: 11,
-    color: '#FFF',
-    fontWeight: '600',
-  },
-  fabSpace: {
-    width: 72,
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 34,
-    alignSelf: 'center',
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: '#FFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#7C3AED',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 12,
   },
 });
