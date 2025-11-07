@@ -173,6 +173,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   bottomSpacer: {
-    height: 16,
+    height: 0,
   },
 });
