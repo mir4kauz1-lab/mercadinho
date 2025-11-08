@@ -10,39 +10,32 @@ import {
   View,
 } from "react-native";
 
-type PaymentMethod = "pix" | "credit" | "debit" | "boleto";
+type PaymentMethod = "credit" | "cash" | "crediario";
 
 export default function PaymentScreen() {
   const router = useRouter();
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("pix");
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("credit");
 
   const paymentMethods = [
     {
-      id: "pix" as PaymentMethod,
-      icon: "qr-code-outline",
-      title: "PIX",
-      subtitle: "Pagamento instantâneo",
-      badge: "Mais rápido",
-    },
-    {
       id: "credit" as PaymentMethod,
       icon: "card-outline",
-      title: "Cartão de Crédito",
-      subtitle: "Em até 12x sem juros",
+      title: "Cartão de Crédito na Entrega",
+      subtitle: "Pague ao receber seu pedido",
       badge: null,
     },
     {
-      id: "debit" as PaymentMethod,
-      icon: "card-outline",
-      title: "Cartão de Débito",
-      subtitle: "Pagamento à vista",
+      id: "cash" as PaymentMethod,
+      icon: "cash-outline",
+      title: "Dinheiro na Entrega",
+      subtitle: "Pague em dinheiro ao receber",
       badge: null,
     },
     {
-      id: "boleto" as PaymentMethod,
-      icon: "barcode-outline",
-      title: "Boleto Bancário",
-      subtitle: "Vencimento em 3 dias",
+      id: "crediario" as PaymentMethod,
+      icon: "calendar-outline",
+      title: "Pagar com Crediário",
+      subtitle: "Parcele no crediário da loja",
       badge: null,
     },
   ];
@@ -121,41 +114,32 @@ export default function PaymentScreen() {
         <View style={styles.detailsContainer}>
           <Text style={styles.detailsTitle}>Informações</Text>
 
-          {selectedMethod === "pix" && (
-            <View style={styles.detailsContent}>
-              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
-              <Text style={styles.detailsText}>
-                Pagamento aprovado na hora. Você receberá um QR Code para
-                escanear no app do seu banco.
-              </Text>
-            </View>
-          )}
-
           {selectedMethod === "credit" && (
             <View style={styles.detailsContent}>
               <Ionicons name="card" size={20} color="#7C3AED" />
               <Text style={styles.detailsText}>
-                Parcele suas compras em até 12x sem juros. Aprovação em minutos.
+                Pague com cartão de crédito no momento da entrega. O pagamento
+                será processado quando você receber seu pedido.
               </Text>
             </View>
           )}
 
-          {selectedMethod === "debit" && (
+          {selectedMethod === "cash" && (
             <View style={styles.detailsContent}>
-              <Ionicons name="cash" size={20} color="#FF9800" />
+              <Ionicons name="cash" size={20} color="#4CAF50" />
               <Text style={styles.detailsText}>
-                Pagamento à vista com desconto. O valor será debitado
-                imediatamente da sua conta.
+                Pague em dinheiro ao receber seu pedido. Tenha o valor exato ou
+                troco disponível.
               </Text>
             </View>
           )}
 
-          {selectedMethod === "boleto" && (
+          {selectedMethod === "crediario" && (
             <View style={styles.detailsContent}>
-              <Ionicons name="document-text" size={20} color="#2196F3" />
+              <Ionicons name="calendar" size={20} color="#FF9800" />
               <Text style={styles.detailsText}>
-                Você receberá o boleto por email. Pagamento compensado em até 3
-                dias úteis.
+                Parcele suas compras no crediário da loja. Consulte as condições
+                disponíveis.
               </Text>
             </View>
           )}
