@@ -44,7 +44,15 @@ export function ProductCard({
   const isEmoji = typeof image === "string" && image.length <= 2;
   const isUrl =
     typeof image === "string" &&
-    (image.startsWith("http") || image.startsWith("https"));
+    (image.startsWith("http") ||
+      image.startsWith("https") ||
+      image.startsWith("/uploads"));
+
+  // Monta URL completa se for caminho relativo
+  const imageUrl =
+    typeof image === "string" && image.startsWith("/uploads")
+      ? `https://santafe-dashboard.vercel.app${image}`
+      : image;
 
   return (
     <TouchableOpacity
@@ -57,7 +65,7 @@ export function ProductCard({
           <Text style={styles.emoji}>{image}</Text>
         ) : isUrl ? (
           <Image
-            source={{ uri: image }}
+            source={{ uri: imageUrl }}
             style={styles.image}
             resizeMode="contain"
           />

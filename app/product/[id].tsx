@@ -1,11 +1,14 @@
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { useCart } from "@/contexts/cart-context";
+import { produtosAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
-import React, { useState } from "react";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -13,21 +16,59 @@ import {
   View,
 } from "react-native";
 
+interface Produto {
+  id: string;
+  nome: string;
+  descricao: string | null;
+  preco: number;
+  estoque: number;
+  imagem: string | null;
+  ativo: boolean;
+  categoria: {
+    id: string;
+    nome: string;
+  };
+}
+
 export default function ProductScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [produto, setProduto] = useState<Produto | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Dados mockados - você pode substituir por dados reais baseados no ID
-  const product = {
-    id: 1,
-    name: "Pão Francês Unidade",
-    price: 1.29,
-    rating: 4.9,
-    description:
-      "Pão Francês Santafé — fresquinho, crocante por fora e macio por dentro! Ideal para o café da manhã ou aquele lanche da tarde irresistível. Peça agora e sinta o sabor da padaria em casa!",
-    image: require("../../assets/images/react-logo.png"),
+  const loadProduto = async () => {
+    try {
+      setLoading(true);
+      const response = await produtosAPI.getAll();
+
+      if (response.success && response.produtos) {
+        const found = response.produtos.find(
+          (p: Produto) => p.id === params.id
+        );
+
+        if (found) {
+          setProduto(found);
+        } else {
+          setError("Produto não encontrado");
+        }
+      } else {
+        setError("Erro ao carregar produto");
+      }
+    } catch (err) {
+      console.error("Erro ao buscar produto:", err);
+      setError("Erro ao carregar produto");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    loadProduto();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id]);
 
   const handleDecrement = () => {
     if (quantity > 1) {
@@ -40,12 +81,14 @@ export default function ProductScreen() {
   };
 
   const handleAddToCart = () => {
+    if (!produto) return;
+
     // Adiciona o produto ao carrinho com a quantidade selecionada
     addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
+      id: parseInt(produto.id) || 0,
+      name: produto.nome,
+      price: produto.preco,
+      image: produto.imagem,
       quantity: quantity,
     });
 
@@ -53,7 +96,58 @@ export default function ProductScreen() {
     router.push("/cart" as any);
   };
 
-  const totalPrice = product.price * quantity;
+  if (loading) {
+    return (
+      <View style={styles.wrapper}>
+        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+        <SafeAreaView style={styles.safeArea}>
+          <View style={[styles.container, styles.centerContent]}>
+            <ActivityIndicator size="large" color="#7C3AED" />
+            <Text style={styles.loadingText}>Carregando produto...</Text>
+          </View>
+        </SafeAreaView>
+      </View>
+    );
+  }
+
+  if (error || !produto) {
+    return (
+      <View style={styles.wrapper}>
+        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+        <SafeAreaView style={styles.safeArea}>
+          <View style={[styles.container, styles.centerContent]}>
+            <Ionicons name="alert-circle-outline" size={64} color="#999" />
+            <Text style={styles.errorText}>
+              {error || "Produto não encontrado"}
+            </Text>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+            >
+              <Text style={styles.backButtonText}>Voltar</Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </View>
+    );
+  }
+
+  const totalPrice = produto.preco * quantity;
+
+  // Verifica se é emoji ou URL
+  const isEmoji =
+    typeof produto.imagem === "string" && produto.imagem.length <= 2;
+  const isUrl =
+    typeof produto.imagem === "string" &&
+    (produto.imagem.startsWith("http") ||
+      produto.imagem.startsWith("https") ||
+      produto.imagem.startsWith("/uploads"));
+
+  // Monta URL completa se for caminho relativo
+  const imageUrl =
+    typeof produto.imagem === "string" && produto.imagem.startsWith("/uploads")
+      ? `https://santafe-dashboard.vercel.app${produto.imagem}`
+      : produto.imagem;
 
   return (
     <>
@@ -75,49 +169,84 @@ export default function ProductScreen() {
             </View>
 
             <View style={styles.content}>
-              <View style={styles.imageContainer}>
-                <Image
-                  source={product.image}
-                  style={styles.image}
-                  resizeMode="contain"
-                />
-              </View>
-
-              <View style={styles.detailsContainer}>
-                <Text style={styles.productName}>{product.name}</Text>
-
-                <View style={styles.ratingRow}>
-                  <Ionicons name="star" size={16} color="#FFA500" />
-                  <Text style={styles.ratingText}>{product.rating}</Text>
-                  <Text style={styles.priceText}>
-                    R$ {product.price.toFixed(2)}
-                  </Text>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={styles.imageContainer}>
+                  {isEmoji ? (
+                    <Text style={styles.emojiImage}>{produto.imagem}</Text>
+                  ) : isUrl ? (
+                    <Image
+                      source={{ uri: imageUrl as string }}
+                      style={styles.image}
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <Ionicons name="image-outline" size={120} color="#DDD" />
+                  )}
                 </View>
 
-                <Text style={styles.description} numberOfLines={3}>
-                  {product.description}
-                </Text>
+                <View style={styles.detailsContainer}>
+                  <Text style={styles.productName}>{produto.nome}</Text>
 
-                <View style={styles.quantitySection}>
-                  <Text style={styles.quantityLabel}>Quantidade</Text>
-                  <View style={styles.quantityControls}>
-                    <TouchableOpacity
-                      style={styles.quantityButton}
-                      onPress={handleDecrement}
-                      disabled={quantity === 1}
+                  <View style={styles.ratingRow}>
+                    <Ionicons name="star" size={16} color="#FFA500" />
+                    <Text style={styles.ratingText}>4.9</Text>
+                    <Text style={styles.priceText}>
+                      R$ {produto.preco.toFixed(2)}
+                    </Text>
+                  </View>
+
+                  <Text style={styles.categoryBadge}>
+                    {produto.categoria.nome}
+                  </Text>
+
+                  {produto.descricao && (
+                    <Text style={styles.description}>{produto.descricao}</Text>
+                  )}
+
+                  <View style={styles.stockInfo}>
+                    <Ionicons
+                      name={
+                        produto.estoque > 0
+                          ? "checkmark-circle"
+                          : "close-circle"
+                      }
+                      size={18}
+                      color={produto.estoque > 0 ? "#10B981" : "#EF4444"}
+                    />
+                    <Text
+                      style={[
+                        styles.stockText,
+                        { color: produto.estoque > 0 ? "#10B981" : "#EF4444" },
+                      ]}
                     >
-                      <Ionicons name="remove" size={20} color="#FFF" />
-                    </TouchableOpacity>
-                    <Text style={styles.quantityValue}>{quantity}</Text>
-                    <TouchableOpacity
-                      style={styles.quantityButton}
-                      onPress={handleIncrement}
-                    >
-                      <Ionicons name="add" size={20} color="#FFF" />
-                    </TouchableOpacity>
+                      {produto.estoque > 0
+                        ? `${produto.estoque} unidades disponíveis`
+                        : "Produto esgotado"}
+                    </Text>
+                  </View>
+
+                  <View style={styles.quantitySection}>
+                    <Text style={styles.quantityLabel}>Quantidade</Text>
+                    <View style={styles.quantityControls}>
+                      <TouchableOpacity
+                        style={styles.quantityButton}
+                        onPress={handleDecrement}
+                        disabled={quantity === 1}
+                      >
+                        <Ionicons name="remove" size={20} color="#FFF" />
+                      </TouchableOpacity>
+                      <Text style={styles.quantityValue}>{quantity}</Text>
+                      <TouchableOpacity
+                        style={styles.quantityButton}
+                        onPress={handleIncrement}
+                        disabled={quantity >= produto.estoque}
+                      >
+                        <Ionicons name="add" size={20} color="#FFF" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
-              </View>
+              </ScrollView>
             </View>
 
             <View style={styles.footer}>
@@ -127,10 +256,16 @@ export default function ProductScreen() {
                 </Text>
               </View>
               <TouchableOpacity
-                style={styles.addToCartButton}
+                style={[
+                  styles.addToCartButton,
+                  produto.estoque === 0 && styles.disabledButton,
+                ]}
                 onPress={handleAddToCart}
+                disabled={produto.estoque === 0}
               >
-                <Text style={styles.addToCartText}>Colocar no Carrinho</Text>
+                <Text style={styles.addToCartText}>
+                  {produto.estoque > 0 ? "Colocar no Carrinho" : "Esgotado"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -278,5 +413,61 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#FFF",
+  },
+  centerContent: {
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#666",
+    marginTop: 8,
+  },
+  errorText: {
+    fontSize: 16,
+    color: "#666",
+    marginTop: 8,
+    textAlign: "center",
+  },
+  backButton: {
+    backgroundColor: "#7C3AED",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginTop: 16,
+  },
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFF",
+  },
+  emojiImage: {
+    fontSize: 120,
+  },
+  categoryBadge: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#7C3AED",
+    backgroundColor: "#EDE9FE",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+    marginBottom: 12,
+  },
+  stockInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 16,
+  },
+  stockText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  disabledButton: {
+    backgroundColor: "#999",
+    opacity: 0.5,
   },
 });

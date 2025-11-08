@@ -1,79 +1,8 @@
 // Configuração da API
-// Tenta usar a API da Vercel primeiro, depois fallback para local
-const API_URLS = [
-  "https://santafe-dashboard.vercel.app/api", // API na Vercel (produção)
-  "http://192.168.56.1:3000/api", // API local (desenvolvimento)
-];
-
-let currentApiUrl = API_URLS[0];
-
-// Função para testar conectividade e escolher a melhor API
-const testApiConnection = async (): Promise<string> => {
-  for (const url of API_URLS) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 segundos de timeout
-
-      const response = await fetch(`${url}/categorias`, {
-        method: "GET",
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        console.log(`✓ API disponível: ${url}`);
-        return url;
-      }
-    } catch {
-      console.log(`✗ API indisponível: ${url}`);
-      continue;
-    }
-  }
-  // Se nenhuma funcionar, usa a primeira (Vercel)
-  return API_URLS[0];
-};
-
-// Inicializa a conexão
-testApiConnection().then((url) => {
-  currentApiUrl = url;
-  console.log(`🔗 Usando API: ${currentApiUrl}`);
-});
-
-// Helper para fazer requisições com fallback
-const fetchWithFallback = async (
-  endpoint: string,
-  options?: RequestInit
-): Promise<Response> => {
-  // Tenta com a URL atual
-  try {
-    const response = await fetch(`${currentApiUrl}${endpoint}`, options);
-    if (response.ok) {
-      return response;
-    }
-  } catch {
-    console.log(`Erro na API principal, tentando alternativa...`);
-  }
-
-  // Se falhar, tenta com as outras URLs
-  for (const url of API_URLS) {
-    if (url === currentApiUrl) continue;
-
-    try {
-      const response = await fetch(`${url}${endpoint}`, options);
-      if (response.ok) {
-        currentApiUrl = url; // Atualiza para usar essa URL daqui pra frente
-        console.log(`✓ Mudando para API: ${currentApiUrl}`);
-        return response;
-      }
-    } catch {
-      continue;
-    }
-  }
-
-  // Se tudo falhar, lança erro
-  throw new Error("Não foi possível conectar a nenhuma API");
-};
+// IMPORTANTE: Substitua pelo IP da sua máquina na rede local
+// Para descobrir seu IP: ipconfig (Windows) ou ifconfig (Mac/Linux)
+// Configuração da API
+const API_URL = "https://santafe-dashboard.vercel.app/api";
 
 export interface ClienteData {
   id: string;
@@ -102,7 +31,7 @@ export const clienteAPI = {
     endereco?: string;
   }): Promise<{ success: boolean; message: string; cliente?: ClienteData }> => {
     try {
-      const response = await fetchWithFallback("/clientes/register", {
+      const response = await fetch(`${API_URL}/clientes/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -127,7 +56,7 @@ export const clienteAPI = {
     senha: string
   ): Promise<{ success: boolean; message: string; cliente?: ClienteData }> => {
     try {
-      const response = await fetchWithFallback("/clientes/login", {
+      const response = await fetch(`${API_URL}/clientes/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -151,8 +80,8 @@ export const clienteAPI = {
     clienteId: string
   ): Promise<{ success: boolean; cliente?: ClienteData; message?: string }> => {
     try {
-      const response = await fetchWithFallback(
-        `/clientes/profile?id=${clienteId}`
+      const response = await fetch(
+        `${API_URL}/clientes/profile?id=${clienteId}`
       );
       const data = await response.json();
       return data;
@@ -175,7 +104,7 @@ export const clienteAPI = {
     novaSenha?: string;
   }): Promise<{ success: boolean; message: string; cliente?: ClienteData }> => {
     try {
-      const response = await fetchWithFallback("/clientes/profile", {
+      const response = await fetch(`${API_URL}/clientes/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -199,7 +128,7 @@ export const clienteAPI = {
     email: string
   ): Promise<{ success: boolean; exists: boolean; message: string }> => {
     try {
-      const response = await fetchWithFallback("/clientes/validate", {
+      const response = await fetch(`${API_URL}/clientes/validate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -225,7 +154,7 @@ export const produtosAPI = {
   // Listar todos os produtos
   getAll: async () => {
     try {
-      const response = await fetchWithFallback("/produtos");
+      const response = await fetch(`${API_URL}/produtos`);
       const data = await response.json();
       return data;
     } catch (error) {
@@ -240,7 +169,7 @@ export const produtosAPI = {
   // Buscar produtos por categoria
   getByCategoria: async (categoriaId: string) => {
     try {
-      const response = await fetchWithFallback("/produtos");
+      const response = await fetch(`${API_URL}/produtos`);
       const data = await response.json();
 
       if (data.success) {
@@ -269,7 +198,7 @@ export const categoriasAPI = {
   // Listar todas as categorias
   getAll: async () => {
     try {
-      const response = await fetchWithFallback("/categorias");
+      const response = await fetch(`${API_URL}/categorias`);
       const data = await response.json();
       return data;
     } catch (error) {
