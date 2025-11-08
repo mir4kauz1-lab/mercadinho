@@ -46,7 +46,7 @@ export default function ProfileScreen() {
       icon: "receipt-outline",
       title: "Pedidos",
       subtitle: "Ver histórico de pedidos",
-      onPress: () => console.log("Pedidos"),
+      onPress: () => router.push("/orders" as any),
     },
     {
       icon: "heart-outline",
