@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface ProductCardProps {
+  id?: string;
   name: string;
   price: number;
   rating: number;
@@ -11,9 +13,23 @@ interface ProductCardProps {
   isFavorite?: boolean;
 }
 
-export function ProductCard({ name, price, rating, image, onFavorite, isFavorite = false }: ProductCardProps) {
+export function ProductCard({ id = '1', name, price, rating, image, onFavorite, isFavorite = false }: ProductCardProps) {
+  const router = useRouter();
+
+  const handlePress = () => {
+    router.push({
+      pathname: '/product/[id]',
+      params: { id },
+    });
+  };
+
+  const handleFavorite = (e: any) => {
+    e.stopPropagation();
+    onFavorite?.();
+  };
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={handlePress} activeOpacity={0.7}>
       <View style={styles.imageContainer}>
         <Image source={image} style={styles.image} resizeMode="contain" />
       </View>
@@ -28,7 +44,7 @@ export function ProductCard({ name, price, rating, image, onFavorite, isFavorite
             <Text style={styles.rating}>{rating.toFixed(1)}</Text>
           </View>
           
-          <TouchableOpacity onPress={onFavorite} style={styles.favoriteButton}>
+          <TouchableOpacity onPress={handleFavorite} style={styles.favoriteButton}>
             <Ionicons 
               name={isFavorite ? "heart" : "heart-outline"} 
               size={24} 
@@ -37,7 +53,7 @@ export function ProductCard({ name, price, rating, image, onFavorite, isFavorite
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
