@@ -164,9 +164,54 @@ export const produtosAPI = {
       };
     }
   },
+
+  // Buscar produtos por categoria
+  getByCategoria: async (categoriaId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/produtos`);
+      const data = await response.json();
+
+      if (data.success) {
+        // Filtra produtos pela categoria
+        const produtosFiltrados = data.produtos.filter(
+          (p: any) => p.categoria.id === categoriaId
+        );
+        return {
+          success: true,
+          produtos: produtosFiltrados,
+        };
+      }
+      return data;
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+      return {
+        success: false,
+        message: "Erro ao conectar com o servidor",
+      };
+    }
+  },
+};
+
+// Serviço de categorias
+export const categoriasAPI = {
+  // Listar todas as categorias
+  getAll: async () => {
+    try {
+      const response = await fetch(`${API_URL}/categorias`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Erro ao buscar categorias:", error);
+      return {
+        success: false,
+        message: "Erro ao conectar com o servidor",
+      };
+    }
+  },
 };
 
 export default {
   clienteAPI,
   produtosAPI,
+  categoriasAPI,
 };

@@ -5,7 +5,7 @@ import {
 import { CategoryFilter } from "@/components/category-filter";
 import { ProductCard } from "@/components/product-card";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ScrollView,
   StatusBar,
@@ -14,77 +14,92 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
+import { produtosAPI, categoriasAPI } from "@/services/api";
+import { storageService } from "@/services/storage";
+import { useRouter } from "expo-router";
 
-// Mock de produtos
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Picanha Friboi kg",
-    price: 69.0,
-    rating: 4.9,
-    image: require("@/assets/images/partial-react-logo.png"),
-    category: "Todos",
-  },
-  {
-    id: 2,
-    name: "Coca-Cola 2L",
-    price: 8.99,
-    rating: 4.8,
-    image: require("@/assets/images/partial-react-logo.png"),
-    category: "Bebidas",
-  },
-  {
-    id: 3,
-    name: "Pão Frances un",
-    price: 1.29,
-    rating: 4.6,
-    image: require("@/assets/images/partial-react-logo.png"),
-    category: "Todos",
-  },
-  {
-    id: 4,
-    name: "Batata Inglesa kg",
-    price: 1.99,
-    rating: 4.5,
-    image: require("@/assets/images/partial-react-logo.png"),
-    category: "Todos",
-  },
-  {
-    id: 5,
-    name: "Arroz Tio João 5kg",
-    price: 28.9,
-    rating: 4.7,
-    image: require("@/assets/images/partial-react-logo.png"),
-    category: "Limpeza",
-  },
-  {
-    id: 6,
-    name: "Feijão Preto kg",
-    price: 7.5,
-    rating: 4.6,
-    image: require("@/assets/images/partial-react-logo.png"),
-    category: "Todos",
-  },
-];
+interface Produto {
+  id: string;
+  nome: string;
+  preco: number;
+  descricao: string | null;
+  imagem: string | null;
+  estoque: number;
+  categoria: {
+    id: string;
+    nome: string;
+  };
+}
 
-const CATEGORIES = ["Todos", "Limpeza", "Bebidas", "Açougue"];
+interface Categoria {
+  id: string;
+  nome: string;
+  _count: {
+    produtos: number;
+  };
+}
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [searchQuery, setSearchQuery] = useState("");
-  const [favorites, setFavorites] = useState<number[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredProducts = PRODUCTS.filter((product) => {
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      // Verifica se está logado
+      const isLoggedIn = await storageService.isLoggedIn();
+      if (!isLoggedIn) {
+        router.replace("../login");
+        return;
+      }
+
+      // Carrega produtos e categorias
+      const [produtosRes, categoriasRes] = await Promise.all([
+        produtosAPI.getAll(),
+        categoriasAPI.getAll(),
+      ]);
+
+      if (produtosRes.success && produtosRes.produtos) {
+        setProdutos(produtosRes.produtos);
+      } else {
+        Alert.alert("Erro", produtosRes.message || "Erro ao carregar produtos");
+      }
+
+      if (categoriasRes.success && categoriasRes.categorias) {
+        setCategorias(categoriasRes.categorias);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+      Alert.alert("Erro", "Erro ao conectar com o servidor");
+    } finally {
+      setLoading(false);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const filteredProducts = produtos.filter((product) => {
     const matchesCategory =
-      selectedCategory === "Todos" || product.category === selectedCategory;
-    const matchesSearch = product.name
+      selectedCategory === "Todos" ||
+      product.categoria.nome === selectedCategory;
+    const matchesSearch = product.nome
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const toggleFavorite = (productId: number) => {
+  const toggleFavorite = (productId: string) => {
     setFavorites((prev) =>
       prev.includes(productId)
         ? prev.filter((id) => id !== productId)
@@ -92,10 +107,30 @@ export default function HomeScreen() {
     );
   };
 
-  const handleLogout = () => {
-    // Aqui você pode adicionar a lógica de logout
-    console.log("Usuário saiu");
+  const handleLogout = async () => {
+    Alert.alert("Sair", "Deseja realmente sair?", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Sair",
+        style: "destructive",
+        onPress: async () => {
+          await storageService.removeCliente();
+          router.replace("../login");
+        },
+      },
+    ]);
   };
+
+  const categoryNames = ["Todos", ...categorias.map((cat) => cat.nome).sort()];
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color="#7C3AED" />
+        <Text style={styles.loadingText}>Carregando produtos...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -131,7 +166,7 @@ export default function HomeScreen() {
 
       {/* Category Filter */}
       <CategoryFilter
-        categories={CATEGORIES}
+        categories={categoryNames}
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
       />
@@ -142,20 +177,30 @@ export default function HomeScreen() {
         contentContainerStyle={styles.productsContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.productsGrid}>
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id.toString()}
-              name={product.name}
-              price={product.price}
-              rating={product.rating}
-              image={product.image}
-              onFavorite={() => toggleFavorite(product.id)}
-              isFavorite={favorites.includes(product.id)}
-            />
-          ))}
-        </View>
+        {filteredProducts.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="search-outline" size={64} color="#CCC" />
+            <Text style={styles.emptyText}>Nenhum produto encontrado</Text>
+            <Text style={styles.emptySubtext}>
+              Tente buscar por outro termo
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.productsGrid}>
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.nome}
+                price={product.preco}
+                rating={4.5}
+                image={product.imagem}
+                onFavorite={() => toggleFavorite(product.id)}
+                isFavorite={favorites.includes(product.id)}
+              />
+            ))}
+          </View>
+        )}
         <View style={styles.bottomSpacer} />
       </ScrollView>
 
@@ -168,6 +213,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F8F8",
+  },
+  centerContent: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: "#666",
   },
   header: {
     flexDirection: "row",
@@ -241,6 +295,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
+  },
+  emptyContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 60,
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#666",
+  },
+  emptySubtext: {
+    marginTop: 8,
+    fontSize: 14,
+    color: "#999",
   },
   bottomSpacer: {
     height: 0,
