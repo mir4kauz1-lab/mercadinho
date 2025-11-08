@@ -6,7 +6,7 @@ import { ScrollView, StatusBar, StyleSheet, Text, TextInput, View } from 'react-
 export default function ExploreScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
+      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
 
       <View style={styles.header}>
         <View>
@@ -14,10 +14,10 @@ export default function ExploreScreen() {
           <Text style={styles.subtitle}>Ofertas especiais para você</Text>
         </View>
         <View style={styles.searchBar}>
-          <Ionicons name="search" size={18} color="#999" />
+          <Ionicons name="search" size={18} color="#FFF" />
           <TextInput
             placeholder="Buscar promoções"
-            placeholderTextColor="#999"
+            placeholderTextColor="rgba(255, 255, 255, 0.7)"
             style={styles.searchInput}
           />
         </View>
@@ -53,25 +53,25 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: '#7C3AED',
     gap: 16,
   },
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#000',
+    color: '#FFF',
   },
   subtitle: {
     fontSize: 13,
-    color: '#666',
+    color: '#E0D4FF',
     marginTop: 4,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 15,
-    color: '#333',
+    color: '#FFF',
   },
   content: {
     paddingHorizontal: 20,

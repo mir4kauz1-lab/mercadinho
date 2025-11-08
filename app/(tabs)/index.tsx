@@ -38,7 +38,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFF" />
+      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
       
       {/* Header */}
       <View style={styles.header}>
@@ -47,7 +47,7 @@ export default function HomeScreen() {
           <Text style={styles.subtitle}>O Supermercado na Sua casa</Text>
         </View>
         <TouchableOpacity style={styles.profileButton}>
-          <Ionicons name="person-circle-outline" size={32} color="#333" />
+          <Ionicons name="person-circle-outline" size={32} color="#FFF" />
         </TouchableOpacity>
       </View>
 
@@ -64,7 +64,7 @@ export default function HomeScreen() {
           />
         </View>
         <TouchableOpacity style={styles.filterButton}>
-          <Ionicons name="options" size={24} color="#FFF" />
+          <Ionicons name="options" size={24} color="#7C3AED" />
         </TouchableOpacity>
       </View>
 
@@ -113,18 +113,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 20,
-    backgroundColor: '#FFF',
+    backgroundColor: '#7C3AED',
   },
   logo: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#000',
+    color: '#FFF',
   },
   subtitle: {
     fontSize: 12,
-    color: '#666',
+    color: '#E0D4FF',
     marginTop: 2,
   },
   profileButton: {
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#FFF',
+    backgroundColor: '#7C3AED',
     gap: 12,
   },
   searchBar: {
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   filterButton: {
     width: 48,
     height: 48,
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#FFF',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

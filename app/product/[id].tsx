@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import {
     Image,
     SafeAreaView,
+    StatusBar,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -39,13 +40,14 @@ export default function ProductScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
+      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
       <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color="#333" />
+          <Ionicons name="arrow-back" size={24} color="#FFF" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="search" size={24} color="#333" />
+          <Ionicons name="search" size={24} color="#FFF" />
         </TouchableOpacity>
       </View>
 
@@ -108,7 +110,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: '#FFF',
+    backgroundColor: '#7C3AED',
   },
   headerButton: {
     padding: 8,
