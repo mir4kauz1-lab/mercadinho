@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-type TabKey = 'home' | 'explore' | 'chat' | 'favorites';
+type TabKey = 'home' | 'explore' | 'credit' | 'chat' | 'favorites';
 
 interface BottomNavigationProps {
   active: TabKey;
@@ -42,6 +42,10 @@ export function BottomNavigation({ active, onFabPress }: BottomNavigationProps) 
             color={active === 'explore' ? '#FFF' : '#E0D4FF'}
           />
           <Text style={active === 'explore' ? styles.navLabelActive : styles.navLabel}>Ofertas</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navItem} onPress={() => handleNavigate('credit')}>
+          <Ionicons name="wallet-outline" size={24} color={active === 'credit' ? '#FFF' : '#E0D4FF'} />
+          <Text style={active === 'credit' ? styles.navLabelActive : styles.navLabel}>Crédito</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem} onPress={() => handleNavigate('chat')}>
           <Ionicons name="chatbubble-ellipses-outline" size={24} color="#E0D4FF" />
