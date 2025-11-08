@@ -41,9 +41,10 @@ export default function ProductScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
-      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
       <View style={styles.wrapper}>
-        <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+        <SafeAreaView style={styles.safeArea}>
+          <View style={styles.container}>
           <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
           <Ionicons name="arrow-back" size={24} color="#FFF" />
@@ -98,12 +99,17 @@ export default function ProductScreen() {
         </View>
         
         <BottomNavigation active="explore" />
-      </SafeAreaView>
+          </View>
+        </SafeAreaView>
       </View>
     </>
   );
 }const styles = StyleSheet.create({
   wrapper: {
+    flex: 1,
+    backgroundColor: '#7C3AED',
+  },
+  safeArea: {
     flex: 1,
     backgroundColor: '#7C3AED',
   },

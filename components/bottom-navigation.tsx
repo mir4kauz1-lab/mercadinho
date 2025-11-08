@@ -62,7 +62,7 @@ export function BottomNavigation({ active, onFabPress }: BottomNavigationProps) 
 
 const styles = StyleSheet.create({
   wrapper: {
-    alignItems: 'center',
+    backgroundColor: '#7C3AED',
     paddingTop: 0,
     paddingBottom: 0,
   },
@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     paddingVertical: 10,
     paddingHorizontal: 24,
+    paddingBottom: 20,
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     width: '100%',
