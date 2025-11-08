@@ -43,7 +43,6 @@ export function BottomNavigation({ active, onFabPress }: BottomNavigationProps) 
           />
           <Text style={active === 'explore' ? styles.navLabelActive : styles.navLabel}>Ofertas</Text>
         </TouchableOpacity>
-        <View style={styles.fabSpace} />
         <TouchableOpacity style={styles.navItem} onPress={() => handleNavigate('chat')}>
           <Ionicons name="chatbubble-ellipses-outline" size={24} color="#E0D4FF" />
           <Text style={styles.navLabel}>Chat</Text>
@@ -53,10 +52,6 @@ export function BottomNavigation({ active, onFabPress }: BottomNavigationProps) 
           <Text style={styles.navLabel}>Favoritos</Text>
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={styles.fab} onPress={onFabPress}>
-        <Ionicons name="add" size={32} color="#7C3AED" />
-      </TouchableOpacity>
     </View>
   );
 }
@@ -99,24 +94,5 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#FFF',
     fontWeight: '600',
-  },
-  fabSpace: {
-    width: 72,
-  },
-  fab: {
-    position: 'absolute',
-    top: -24,
-    alignSelf: 'center',
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: '#FFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#7C3AED',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 12,
   },
 });
