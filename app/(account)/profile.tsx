@@ -148,9 +148,8 @@ export default function ProfileScreen() {
   if (contextLoading || isLoadingData) {
     return (
       <View style={[styles.container, styles.centerContent]}>
-        {" "}
-        <ActivityIndicator size="large" color="#7C3AED" />{" "}
-        <Text style={styles.loadingText}>Carregando...</Text>{" "}
+        <ActivityIndicator size="large" color="#7C3AED" />
+        <Text style={styles.loadingText}>Carregando...</Text>
       </View>
     );
   }

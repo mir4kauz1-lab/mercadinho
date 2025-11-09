@@ -1,8 +1,8 @@
 import { useCart } from "@/contexts/cart-context";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 
 type TabKey = "home" | "explore" | "credit" | "chat" | "favorites";
 
@@ -21,64 +21,53 @@ export function BottomNavigation({
   const { getTotalItems } = useCart();
   const itemCount = getTotalItems();
 
-  const handleNavigate = (key: TabKey) => {
-    switch (key) {
-      case "home":
-        router.replace("/(tabs)");
-        break;
-      case "explore":
-        router.replace("/(tabs)/explore");
-        break;
-      case "favorites":
-        router.push("/profile" as any);
-        break;
-      default:
-        break;
-    }
-  };
-
   const handleCartPress = () => {
     router.push("/cart" as any);
+  };
+
+  const handleProfilePress = () => {
+    router.push("/(account)/profile" as any);
   };
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.nav}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => handleNavigate("home")}
-        >
-          <Ionicons
-            name="home"
-            size={24}
-            color={active === "home" ? "#FFF" : "#E0D4FF"}
-          />
-          <Text
-            style={active === "home" ? styles.navLabelActive : styles.navLabel}
-          >
-            Home
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => handleNavigate("explore")}
-        >
-          <Ionicons
-            name="pricetag-outline"
-            size={24}
-            color={active === "explore" ? "#FFF" : "#E0D4FF"}
-          />
-          <Text
-            style={
-              active === "explore" ? styles.navLabelActive : styles.navLabel
-            }
-          >
-            Ofertas
-          </Text>
-        </TouchableOpacity>
+        <Link href="/(tabs)" asChild>
+          <Pressable style={styles.navItem}>
+            <Ionicons
+              name="home"
+              size={24}
+              color={active === "home" ? "#FFF" : "#E0D4FF"}
+            />
+            <Text
+              style={
+                active === "home" ? styles.navLabelActive : styles.navLabel
+              }
+            >
+              Home
+            </Text>
+          </Pressable>
+        </Link>
+
+        <Link href="/(tabs)/explore" asChild>
+          <Pressable style={styles.navItem}>
+            <Ionicons
+              name="pricetag-outline"
+              size={24}
+              color={active === "explore" ? "#FFF" : "#E0D4FF"}
+            />
+            <Text
+              style={
+                active === "explore" ? styles.navLabelActive : styles.navLabel
+              }
+            >
+              Ofertas
+            </Text>
+          </Pressable>
+        </Link>
 
         {/* Carrinho */}
-        <TouchableOpacity style={styles.navItem} onPress={handleCartPress}>
+        <Pressable style={styles.navItem} onPress={handleCartPress}>
           <View>
             <Ionicons name="cart" size={24} color="#E0D4FF" />
             {itemCount > 0 && (
@@ -88,12 +77,9 @@ export function BottomNavigation({
             )}
           </View>
           <Text style={styles.navLabel}>Carrinho</Text>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => handleNavigate("favorites")}
-        >
+        <Pressable style={styles.navItem} onPress={handleProfilePress}>
           <Ionicons
             name="person-outline"
             size={24}
@@ -106,7 +92,7 @@ export function BottomNavigation({
           >
             Conta
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

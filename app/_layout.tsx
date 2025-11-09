@@ -26,7 +26,8 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
-  initialRouteName: "splash",
+  // Must include route group prefix when using grouped segments
+  initialRouteName: "(auth)/splash",
 };
 
 export default function RootLayout() {
@@ -58,27 +59,48 @@ export default function RootLayout() {
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
           <Stack>
-            <Stack.Screen name="splash" options={{ headerShown: false }} />
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-            <Stack.Screen name="signup" options={{ headerShown: false }} />
-            <Stack.Screen name="profile" options={{ headerShown: false }} />
-            <Stack.Screen name="payment" options={{ headerShown: false }} />
-            <Stack.Screen name="checkout" options={{ headerShown: false }} />
             <Stack.Screen
-              name="order-success"
+              name="(auth)/splash"
               options={{ headerShown: false }}
             />
-            <Stack.Screen name="orders" options={{ headerShown: false }} />
             <Stack.Screen
-              name="order-tracking"
+              name="(auth)/login"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(auth)/signup"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(account)/profile"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(account)/payment"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(cart)/checkout"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(account)/order-success"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(account)/orders"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="(account)/order-tracking"
               options={{ headerShown: false }}
             />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
-              name="product/[id]"
+              name="(product)/product/[id]"
               options={{ headerShown: false }}
             />
-            <Stack.Screen name="cart" options={{ headerShown: false }} />
+            <Stack.Screen name="(cart)/cart" options={{ headerShown: false }} />
             <Stack.Screen
               name="modal"
               options={{ presentation: "modal", title: "Modal" }}
