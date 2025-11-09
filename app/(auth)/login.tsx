@@ -14,8 +14,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { clienteAPI } from "../services/api";
-import { storageService } from "../services/storage";
+import { clienteAPI } from "../../services/api"; // path ajustado após mover para (auth)
+import { storageService } from "../../services/storage"; // path ajustado
 import { useUser } from "@/contexts/user-context";
 
 export default function LoginScreen() {
@@ -27,21 +27,15 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    // Validação
     if (!email || !password) {
       Alert.alert("Erro", "Por favor, preencha todos os campos");
       return;
     }
-
     setLoading(true);
-
     try {
       const result = await clienteAPI.login(email, password);
-
       if (result.success && result.cliente) {
-        // Salva dados do cliente no contexto e storage
         await storageService.saveCliente(result.cliente);
-        // Converte ClienteData para UserData adicionando campos faltantes
         const userData = {
           ...result.cliente,
           cpf: null,
@@ -51,8 +45,6 @@ export default function LoginScreen() {
           updatedAt: new Date().toISOString(),
         };
         await loginUser(userData);
-
-        // Redireciona para home
         router.replace("/(tabs)" as any);
       } else {
         Alert.alert("Erro", result.message || "Erro ao fazer login");
@@ -90,13 +82,11 @@ export default function LoginScreen() {
           <Text style={styles.title}>SantaFé</Text>
           <Text style={styles.subtitle}>Supermercado</Text>
         </View>
-
         <View style={styles.formContainer}>
           <Text style={styles.formTitle}>Bem-vindo de volta!</Text>
           <Text style={styles.formSubtitle}>
             Faça login para continuar suas compras
           </Text>
-
           <View style={styles.inputContainer}>
             <Text style={styles.label}>E-mail</Text>
             <View style={styles.inputWrapper}>
@@ -117,7 +107,6 @@ export default function LoginScreen() {
               />
             </View>
           </View>
-
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Senha</Text>
             <View style={styles.inputWrapper}>
@@ -147,14 +136,12 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </View>
           </View>
-
           <TouchableOpacity
             style={styles.forgotPassword}
             onPress={handleForgotPassword}
           >
             <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={[styles.loginButton, loading && styles.loginButtonDisabled]}
             onPress={handleLogin}
@@ -166,13 +153,11 @@ export default function LoginScreen() {
               <Text style={styles.loginButtonText}>Entrar</Text>
             )}
           </TouchableOpacity>
-
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
             <Text style={styles.dividerText}>ou</Text>
             <View style={styles.dividerLine} />
           </View>
-
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Não tem uma conta? </Text>
             <TouchableOpacity onPress={handleSignUp}>
@@ -184,29 +169,12 @@ export default function LoginScreen() {
     </KeyboardAvoidingView>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#7C3AED",
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  header: {
-    alignItems: "center",
-    paddingTop: 60,
-    paddingBottom: 40,
-  },
-  logoContainer: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 40,
-    fontWeight: "800",
-    color: "#FFF",
-    letterSpacing: 1,
-  },
+  container: { flex: 1, backgroundColor: "#7C3AED" },
+  scrollContent: { flexGrow: 1 },
+  header: { alignItems: "center", paddingTop: 60, paddingBottom: 40 },
+  logoContainer: { marginBottom: 20 },
+  title: { fontSize: 40, fontWeight: "800", color: "#FFF", letterSpacing: 1 },
   subtitle: {
     fontSize: 18,
     fontWeight: "300",
@@ -229,20 +197,9 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
   },
-  formSubtitle: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 32,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 8,
-  },
+  formSubtitle: { fontSize: 14, color: "#666", marginBottom: 32 },
+  inputContainer: { marginBottom: 20 },
+  label: { fontSize: 14, fontWeight: "600", color: "#333", marginBottom: 8 },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -251,26 +208,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     height: 52,
   },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: "#333",
-  },
-  eyeIcon: {
-    padding: 4,
-  },
-  forgotPassword: {
-    alignSelf: "flex-end",
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#7C3AED",
-  },
+  inputIcon: { marginRight: 12 },
+  input: { flex: 1, fontSize: 16, color: "#333" },
+  eyeIcon: { padding: 4 },
+  forgotPassword: { alignSelf: "flex-end", marginBottom: 24 },
+  forgotPasswordText: { fontSize: 14, fontWeight: "600", color: "#7C3AED" },
   loginButton: {
     backgroundColor: "#7C3AED",
     borderRadius: 12,
@@ -283,42 +225,21 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  loginButtonDisabled: {
-    backgroundColor: "#B8A3E8",
-  },
+  loginButtonDisabled: { backgroundColor: "#B8A3E8" },
   loginButtonText: {
     fontSize: 16,
     fontWeight: "700",
     color: "#FFF",
     letterSpacing: 0.5,
   },
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 24,
-  },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#E0E0E0",
-  },
-  dividerText: {
-    fontSize: 14,
-    color: "#999",
-    marginHorizontal: 16,
-  },
+  divider: { flexDirection: "row", alignItems: "center", marginVertical: 24 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: "#E0E0E0" },
+  dividerText: { fontSize: 14, color: "#999", marginHorizontal: 16 },
   signupContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
-  signupText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  signupLink: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#7C3AED",
-  },
+  signupText: { fontSize: 14, color: "#666" },
+  signupLink: { fontSize: 14, fontWeight: "700", color: "#7C3AED" },
 });

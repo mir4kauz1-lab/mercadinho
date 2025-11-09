@@ -1,3 +1,4 @@
+// Order tracking movido para (account)
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
@@ -9,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 type TrackingStep = {
   id: number;
   title: string;
@@ -19,12 +19,10 @@ type TrackingStep = {
   active: boolean;
   timestamp?: string;
 };
-
 export default function OrderTrackingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const orderId = params.orderId as string;
-
   const trackingSteps: TrackingStep[] = [
     {
       id: 1,
@@ -62,41 +60,40 @@ export default function OrderTrackingScreen() {
       active: false,
     },
   ];
-
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-
-      {/* Header */}
+      {" "}
+      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />{" "}
       <View style={styles.header}>
+        {" "}
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={24} color="#FFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Acompanhar Pedido</Text>
-        <View style={styles.placeholder} />
-      </View>
-
+        </TouchableOpacity>{" "}
+        <Text style={styles.headerTitle}>Acompanhar Pedido</Text>{" "}
+        <View style={styles.placeholder} />{" "}
+      </View>{" "}
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Order Info Card */}
+        {" "}
         <View style={styles.orderInfoCard}>
+          {" "}
           <View style={styles.orderInfoHeader}>
+            {" "}
             <View>
               <Text style={styles.orderLabel}>Pedido</Text>
               <Text style={styles.orderNumber}>#{orderId}</Text>
-            </View>
+            </View>{" "}
             <View style={styles.statusBadge}>
               <Ionicons name="car-outline" size={20} color="#2196F3" />
               <Text style={styles.statusText}>A Caminho</Text>
-            </View>
-          </View>
-
+            </View>{" "}
+          </View>{" "}
           <View style={styles.deliveryInfo}>
             <Ionicons name="location" size={24} color="#7C3AED" />
             <View style={styles.deliveryDetails}>
@@ -106,24 +103,23 @@ export default function OrderTrackingScreen() {
               </Text>
               <Text style={styles.deliveryAddress}>São Paulo - SP</Text>
             </View>
-          </View>
-
+          </View>{" "}
           <View style={styles.estimateContainer}>
             <Ionicons name="time-outline" size={20} color="#4CAF50" />
             <Text style={styles.estimateText}>
               Previsão de entrega:{" "}
               <Text style={styles.estimateTime}>30-45 min</Text>
             </Text>
-          </View>
-        </View>
-
-        {/* Tracking Timeline */}
+          </View>{" "}
+        </View>{" "}
         <View style={styles.timelineContainer}>
-          <Text style={styles.timelineTitle}>Status do Pedido</Text>
-
+          {" "}
+          <Text style={styles.timelineTitle}>Status do Pedido</Text>{" "}
           {trackingSteps.map((step, index) => (
             <View key={step.id} style={styles.timelineItem}>
+              {" "}
               <View style={styles.timelineIconContainer}>
+                {" "}
                 <View
                   style={[
                     styles.timelineIcon,
@@ -136,7 +132,7 @@ export default function OrderTrackingScreen() {
                     size={24}
                     color={step.completed || step.active ? "#FFF" : "#CCC"}
                   />
-                </View>
+                </View>{" "}
                 {index < trackingSteps.length - 1 && (
                   <View
                     style={[
@@ -144,10 +140,10 @@ export default function OrderTrackingScreen() {
                       step.completed && styles.timelineLineCompleted,
                     ]}
                   />
-                )}
-              </View>
-
+                )}{" "}
+              </View>{" "}
               <View style={styles.timelineContent}>
+                {" "}
                 <Text
                   style={[
                     styles.timelineStepTitle,
@@ -156,53 +152,46 @@ export default function OrderTrackingScreen() {
                   ]}
                 >
                   {step.title}
-                </Text>
-                <Text style={styles.timelineStepSubtitle}>{step.subtitle}</Text>
+                </Text>{" "}
+                <Text style={styles.timelineStepSubtitle}>{step.subtitle}</Text>{" "}
                 {step.timestamp && (
                   <Text style={styles.timelineTimestamp}>{step.timestamp}</Text>
-                )}
-              </View>
+                )}{" "}
+              </View>{" "}
             </View>
-          ))}
-        </View>
-
-        {/* Help Section */}
+          ))}{" "}
+        </View>{" "}
         <View style={styles.helpCard}>
-          <Ionicons name="help-circle-outline" size={24} color="#7C3AED" />
+          {" "}
+          <Ionicons name="help-circle-outline" size={24} color="#7C3AED" />{" "}
           <View style={styles.helpContent}>
             <Text style={styles.helpTitle}>Precisa de ajuda?</Text>
             <Text style={styles.helpText}>
               Entre em contato com nosso suporte para qualquer dúvida sobre seu
               pedido
             </Text>
-          </View>
+          </View>{" "}
           <TouchableOpacity style={styles.helpButton}>
             <Ionicons name="chatbubble-outline" size={20} color="#7C3AED" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
-
-      {/* Footer Actions */}
+          </TouchableOpacity>{" "}
+        </View>{" "}
+        <View style={styles.bottomSpacer} />{" "}
+      </ScrollView>{" "}
       <View style={styles.footer}>
+        {" "}
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => router.push("/orders" as any)}
         >
           <Ionicons name="receipt-outline" size={24} color="#7C3AED" />
           <Text style={styles.secondaryButtonText}>Ver Todos os Pedidos</Text>
-        </TouchableOpacity>
-      </View>
+        </TouchableOpacity>{" "}
+      </View>{" "}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
+  container: { flex: 1, backgroundColor: "#F5F5F5" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -212,23 +201,11 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: "#7C3AED",
   },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#FFF",
-  },
-  placeholder: {
-    width: 32,
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: 16,
-  },
+  backButton: { padding: 4 },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#FFF" },
+  placeholder: { width: 32 },
+  content: { flex: 1 },
+  contentContainer: { padding: 16 },
   orderInfoCard: {
     backgroundColor: "#FFF",
     borderRadius: 16,
@@ -249,16 +226,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#F0F0F0",
   },
-  orderLabel: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 4,
-  },
-  orderNumber: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#333",
-  },
+  orderLabel: { fontSize: 14, color: "#666", marginBottom: 4 },
+  orderNumber: { fontSize: 20, fontWeight: "700", color: "#333" },
   statusBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -268,30 +237,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 6,
   },
-  statusText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#2196F3",
-  },
-  deliveryInfo: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 16,
-  },
-  deliveryDetails: {
-    flex: 1,
-  },
+  statusText: { fontSize: 13, fontWeight: "700", color: "#2196F3" },
+  deliveryInfo: { flexDirection: "row", gap: 12, marginBottom: 16 },
+  deliveryDetails: { flex: 1 },
   deliveryTitle: {
     fontSize: 14,
     fontWeight: "700",
     color: "#333",
     marginBottom: 6,
   },
-  deliveryAddress: {
-    fontSize: 14,
-    color: "#666",
-    lineHeight: 20,
-  },
+  deliveryAddress: { fontSize: 14, color: "#666", lineHeight: 20 },
   estimateContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -300,13 +255,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     gap: 8,
   },
-  estimateText: {
-    fontSize: 14,
-    color: "#4CAF50",
-  },
-  estimateTime: {
-    fontWeight: "700",
-  },
+  estimateText: { fontSize: 14, color: "#4CAF50" },
+  estimateTime: { fontWeight: "700" },
   timelineContainer: {
     backgroundColor: "#FFF",
     borderRadius: 16,
@@ -324,13 +274,8 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 24,
   },
-  timelineItem: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  timelineIconContainer: {
-    alignItems: "center",
-  },
+  timelineItem: { flexDirection: "row", gap: 16 },
+  timelineIconContainer: { alignItems: "center" },
   timelineIcon: {
     width: 48,
     height: 48,
@@ -339,45 +284,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  timelineIconCompleted: {
-    backgroundColor: "#4CAF50",
-  },
-  timelineIconActive: {
-    backgroundColor: "#2196F3",
-  },
+  timelineIconCompleted: { backgroundColor: "#4CAF50" },
+  timelineIconActive: { backgroundColor: "#2196F3" },
   timelineLine: {
     width: 2,
     flex: 1,
     backgroundColor: "#E0E0E0",
     marginVertical: 8,
   },
-  timelineLineCompleted: {
-    backgroundColor: "#4CAF50",
-  },
-  timelineContent: {
-    flex: 1,
-    paddingBottom: 24,
-  },
+  timelineLineCompleted: { backgroundColor: "#4CAF50" },
+  timelineContent: { flex: 1, paddingBottom: 24 },
   timelineStepTitle: {
     fontSize: 16,
     fontWeight: "700",
     color: "#999",
     marginBottom: 4,
   },
-  timelineStepTitleActive: {
-    color: "#333",
-  },
+  timelineStepTitleActive: { color: "#333" },
   timelineStepSubtitle: {
     fontSize: 14,
     color: "#666",
     lineHeight: 20,
     marginBottom: 6,
   },
-  timelineTimestamp: {
-    fontSize: 12,
-    color: "#999",
-    marginTop: 4,
-  },
+  timelineTimestamp: { fontSize: 12, color: "#999", marginTop: 4 },
   helpCard: {
     flexDirection: "row",
     backgroundColor: "#F0E7FF",
@@ -388,20 +318,14 @@ const styles = StyleSheet.create({
     borderColor: "#7C3AED",
     alignItems: "center",
   },
-  helpContent: {
-    flex: 1,
-  },
+  helpContent: { flex: 1 },
   helpTitle: {
     fontSize: 14,
     fontWeight: "700",
     color: "#7C3AED",
     marginBottom: 4,
   },
-  helpText: {
-    fontSize: 13,
-    color: "#7C3AED",
-    lineHeight: 18,
-  },
+  helpText: { fontSize: 13, color: "#7C3AED", lineHeight: 18 },
   helpButton: {
     width: 40,
     height: 40,
@@ -410,9 +334,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  bottomSpacer: {
-    height: 20,
-  },
+  bottomSpacer: { height: 20 },
   footer: {
     padding: 16,
     backgroundColor: "#FFF",

@@ -1,3 +1,4 @@
+// Orders movido para (account)
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -9,9 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 type OrderStatus = "preparing" | "on-way" | "delivered" | "cancelled";
-
 interface Order {
   id: string;
   date: string;
@@ -20,11 +19,8 @@ interface Order {
   items: number;
   paymentMethod: string;
 }
-
 export default function OrdersScreen() {
   const router = useRouter();
-
-  // Pedidos de exemplo
   const orders: Order[] = [
     {
       id: "847291",
@@ -59,7 +55,6 @@ export default function OrdersScreen() {
       paymentMethod: "Cartão de Crédito",
     },
   ];
-
   const getStatusInfo = (status: OrderStatus) => {
     switch (status) {
       case "preparing":
@@ -92,28 +87,27 @@ export default function OrdersScreen() {
         };
     }
   };
-
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-
-      {/* Header */}
+      {" "}
+      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />{" "}
       <View style={styles.header}>
+        {" "}
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={24} color="#FFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Meus Pedidos</Text>
-        <View style={styles.placeholder} />
-      </View>
-
+        </TouchableOpacity>{" "}
+        <Text style={styles.headerTitle}>Meus Pedidos</Text>{" "}
+        <View style={styles.placeholder} />{" "}
+      </View>{" "}
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
+        {" "}
         {orders.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Ionicons name="receipt-outline" size={80} color="#CCC" />
@@ -133,11 +127,13 @@ export default function OrdersScreen() {
                   router.push(`/order-tracking?orderId=${order.id}` as any)
                 }
               >
+                {" "}
                 <View style={styles.orderHeader}>
+                  {" "}
                   <View style={styles.orderIdContainer}>
                     <Text style={styles.orderIdLabel}>Pedido</Text>
                     <Text style={styles.orderIdValue}>#{order.id}</Text>
-                  </View>
+                  </View>{" "}
                   <View
                     style={[
                       styles.statusBadge,
@@ -154,35 +150,34 @@ export default function OrdersScreen() {
                     >
                       {statusInfo.label}
                     </Text>
-                  </View>
-                </View>
-
-                <View style={styles.orderDivider} />
-
+                  </View>{" "}
+                </View>{" "}
+                <View style={styles.orderDivider} />{" "}
                 <View style={styles.orderDetails}>
+                  {" "}
                   <View style={styles.detailRow}>
                     <Ionicons name="calendar-outline" size={18} color="#666" />
                     <Text style={styles.detailText}>{order.date}</Text>
-                  </View>
+                  </View>{" "}
                   <View style={styles.detailRow}>
                     <Ionicons name="cart-outline" size={18} color="#666" />
                     <Text style={styles.detailText}>
                       {order.items} {order.items === 1 ? "item" : "itens"}
                     </Text>
-                  </View>
+                  </View>{" "}
                   <View style={styles.detailRow}>
                     <Ionicons name="card-outline" size={18} color="#666" />
                     <Text style={styles.detailText}>{order.paymentMethod}</Text>
-                  </View>
-                </View>
-
+                  </View>{" "}
+                </View>{" "}
                 <View style={styles.orderFooter}>
+                  {" "}
                   <View>
                     <Text style={styles.totalLabel}>Total</Text>
                     <Text style={styles.totalValue}>
                       R$ {order.total.toFixed(2)}
                     </Text>
-                  </View>
+                  </View>{" "}
                   <TouchableOpacity style={styles.viewButton}>
                     <Text style={styles.viewButtonText}>Ver Detalhes</Text>
                     <Ionicons
@@ -190,22 +185,18 @@ export default function OrdersScreen() {
                       size={20}
                       color="#7C3AED"
                     />
-                  </TouchableOpacity>
-                </View>
+                  </TouchableOpacity>{" "}
+                </View>{" "}
               </TouchableOpacity>
             );
           })
-        )}
-      </ScrollView>
+        )}{" "}
+      </ScrollView>{" "}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
+  container: { flex: 1, backgroundColor: "#F5F5F5" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -215,39 +206,18 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: "#7C3AED",
   },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#FFF",
-  },
-  placeholder: {
-    width: 32,
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: 16,
-  },
+  backButton: { padding: 4 },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#FFF" },
+  placeholder: { width: 32 },
+  content: { flex: 1 },
+  contentContainer: { padding: 16 },
   emptyContainer: {
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 100,
   },
-  emptyText: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#999",
-    marginTop: 20,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: "#CCC",
-    marginTop: 8,
-  },
+  emptyText: { fontSize: 20, fontWeight: "700", color: "#999", marginTop: 20 },
+  emptySubtext: { fontSize: 14, color: "#CCC", marginTop: 8 },
   orderCard: {
     backgroundColor: "#FFF",
     borderRadius: 16,
@@ -265,20 +235,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
   },
-  orderIdContainer: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: 6,
-  },
-  orderIdLabel: {
-    fontSize: 14,
-    color: "#666",
-  },
-  orderIdValue: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#333",
-  },
+  orderIdContainer: { flexDirection: "row", alignItems: "baseline", gap: 6 },
+  orderIdLabel: { fontSize: 14, color: "#666" },
+  orderIdValue: { fontSize: 18, fontWeight: "700", color: "#333" },
   statusBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -287,28 +246,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 6,
   },
-  statusText: {
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  orderDivider: {
-    height: 1,
-    backgroundColor: "#E0E0E0",
-    marginBottom: 16,
-  },
-  orderDetails: {
-    gap: 12,
-    marginBottom: 16,
-  },
-  detailRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  detailText: {
-    fontSize: 14,
-    color: "#666",
-  },
+  statusText: { fontSize: 12, fontWeight: "700" },
+  orderDivider: { height: 1, backgroundColor: "#E0E0E0", marginBottom: 16 },
+  orderDetails: { gap: 12, marginBottom: 16 },
+  detailRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  detailText: { fontSize: 14, color: "#666" },
   orderFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -317,24 +259,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#F0F0F0",
   },
-  totalLabel: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 4,
-  },
-  totalValue: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#7C3AED",
-  },
-  viewButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  viewButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#7C3AED",
-  },
+  totalLabel: { fontSize: 12, color: "#666", marginBottom: 4 },
+  totalValue: { fontSize: 20, fontWeight: "700", color: "#7C3AED" },
+  viewButton: { flexDirection: "row", alignItems: "center", gap: 4 },
+  viewButtonText: { fontSize: 14, fontWeight: "600", color: "#7C3AED" },
 });

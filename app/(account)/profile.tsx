@@ -1,9 +1,10 @@
+// Conteúdo original de profile.tsx movido para (account) sem alterações
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { useUser } from "@/contexts/user-context";
 import { userAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ScrollView,
   StatusBar,
@@ -19,12 +20,9 @@ import {
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, logout, updateUser, isLoading: contextLoading } = useUser();
-
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
-
-  // Dados do formulário
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -33,24 +31,11 @@ export default function ProfileScreen() {
   const [cidade, setCidade] = useState("");
   const [estado, setEstado] = useState("");
   const [cep, setCep] = useState("");
-
-  useEffect(() => {
-    if (user) {
-      loadUserData();
-    } else if (!contextLoading) {
-      // Se não há usuário logado, redireciona para login
-      router.replace("/login" as any);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, contextLoading]);
-
-  const loadUserData = async () => {
+  const loadUserData = useCallback(async () => {
     if (!user) return;
-
     try {
       setIsLoadingData(true);
       const response = await userAPI.getUser(user.id);
-
       if (response.success && response.cliente) {
         const userData = response.cliente;
         setNome(userData.nome);
@@ -68,8 +53,14 @@ export default function ProfileScreen() {
     } finally {
       setIsLoadingData(false);
     }
-  };
-
+  }, [user]);
+  useEffect(() => {
+    if (user) {
+      loadUserData();
+    } else if (!contextLoading) {
+      router.replace("/login" as any);
+    }
+  }, [user, contextLoading, loadUserData, router]);
   const handleLogout = async () => {
     Alert.alert("Sair", "Deseja realmente sair da sua conta?", [
       { text: "Cancelar", style: "cancel" },
@@ -87,23 +78,18 @@ export default function ProfileScreen() {
       },
     ]);
   };
-
   const handleSave = async () => {
     if (!user) return;
-
     if (!nome.trim()) {
       Alert.alert("Atenção", "O nome é obrigatório");
       return;
     }
-
     if (!email.trim()) {
       Alert.alert("Atenção", "O email é obrigatório");
       return;
     }
-
     try {
       setIsSaving(true);
-
       const response = await userAPI.updateUser({
         id: user.id,
         nome: nome.trim(),
@@ -115,7 +101,6 @@ export default function ProfileScreen() {
         estado: estado.trim() || undefined,
         cep: cep.trim() || undefined,
       });
-
       if (response.success && response.cliente) {
         await updateUser(response.cliente);
         setIsEditing(false);
@@ -130,7 +115,6 @@ export default function ProfileScreen() {
       setIsSaving(false);
     }
   };
-
   const handleCancel = () => {
     if (user) {
       setNome(user.nome);
@@ -144,20 +128,18 @@ export default function ProfileScreen() {
     }
     setIsEditing(false);
   };
-
   if (contextLoading || isLoadingData) {
     return (
       <View style={[styles.container, styles.centerContent]}>
-        <ActivityIndicator size="large" color="#7C3AED" />
-        <Text style={styles.loadingText}>Carregando...</Text>
+        {" "}
+        <ActivityIndicator size="large" color="#7C3AED" />{" "}
+        <Text style={styles.loadingText}>Carregando...</Text>{" "}
       </View>
     );
   }
-
   if (!user) {
     return null;
   }
-
   const menuItems = [
     {
       icon: "location-outline",
@@ -202,12 +184,9 @@ export default function ProfileScreen() {
       onPress: () => console.log("Sobre"),
     },
   ];
-
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>
           {isEditing ? "Editar Perfil" : "Minha Conta"}
@@ -238,13 +217,11 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         )}
       </View>
-
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Card */}
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
             <Ionicons name="person" size={40} color="#FFF" />
@@ -262,9 +239,7 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           )}
         </View>
-
         {isEditing ? (
-          // Formulário de Edição
           <View style={styles.formContainer}>
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Nome completo *</Text>
@@ -276,7 +251,6 @@ export default function ProfileScreen() {
                 placeholderTextColor="#999"
               />
             </View>
-
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Email *</Text>
               <TextInput
@@ -289,7 +263,6 @@ export default function ProfileScreen() {
                 autoCapitalize="none"
               />
             </View>
-
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Telefone</Text>
               <TextInput
@@ -301,7 +274,6 @@ export default function ProfileScreen() {
                 keyboardType="phone-pad"
               />
             </View>
-
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>CPF</Text>
               <TextInput
@@ -313,7 +285,6 @@ export default function ProfileScreen() {
                 keyboardType="numeric"
               />
             </View>
-
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Endereço</Text>
               <TextInput
@@ -324,7 +295,6 @@ export default function ProfileScreen() {
                 placeholderTextColor="#999"
               />
             </View>
-
             <View style={styles.inputRow}>
               <View style={[styles.inputGroup, { flex: 2 }]}>
                 <Text style={styles.inputLabel}>Cidade</Text>
@@ -336,7 +306,6 @@ export default function ProfileScreen() {
                   placeholderTextColor="#999"
                 />
               </View>
-
               <View style={[styles.inputGroup, { flex: 1, marginLeft: 12 }]}>
                 <Text style={styles.inputLabel}>Estado</Text>
                 <TextInput
@@ -350,7 +319,6 @@ export default function ProfileScreen() {
                 />
               </View>
             </View>
-
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>CEP</Text>
               <TextInput
@@ -362,11 +330,9 @@ export default function ProfileScreen() {
                 keyboardType="numeric"
               />
             </View>
-
             <Text style={styles.requiredNote}>* Campos obrigatórios</Text>
           </View>
         ) : (
-          // Menu Items
           <>
             <View style={styles.menuContainer}>
               {menuItems.map((item, index) => (
@@ -390,7 +356,6 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-
             <TouchableOpacity
               style={styles.logoutButtonLarge}
               onPress={handleLogout}
@@ -398,34 +363,19 @@ export default function ProfileScreen() {
               <Ionicons name="log-out-outline" size={20} color="#E63946" />
               <Text style={styles.logoutButtonText}>Sair da conta</Text>
             </TouchableOpacity>
-
             <Text style={styles.version}>Versão 1.0.0</Text>
           </>
         )}
-
         <View style={styles.bottomSpacer} />
       </ScrollView>
-
-      {/* Passa a aba ativa correta para destacar o ícone de Conta */}
       <BottomNavigation active="favorites" />
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
-  centerContent: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: "#666",
-  },
+  container: { flex: 1, backgroundColor: "#F5F5F5" },
+  centerContent: { alignItems: "center", justifyContent: "center" },
+  loadingText: { marginTop: 12, fontSize: 16, color: "#666" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -435,24 +385,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: "#7C3AED",
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#FFF",
-  },
-  headerActions: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  headerButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FFF",
-  },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#FFF" },
+  headerActions: { flexDirection: "row", gap: 12 },
+  headerButton: { paddingHorizontal: 16, paddingVertical: 8 },
+  cancelButtonText: { fontSize: 16, fontWeight: "600", color: "#FFF" },
   saveButton: {
     backgroundColor: "rgba(255,255,255,0.2)",
     paddingHorizontal: 16,
@@ -461,22 +397,10 @@ const styles = StyleSheet.create({
     minWidth: 80,
     alignItems: "center",
   },
-  saveButtonText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#FFF",
-  },
-  logoutButton: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FFF",
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingBottom: 20,
-  },
+  saveButtonText: { fontSize: 16, fontWeight: "700", color: "#FFF" },
+  logoutButton: { fontSize: 16, fontWeight: "600", color: "#FFF" },
+  content: { flex: 1 },
+  contentContainer: { paddingBottom: 20 },
   profileCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -501,22 +425,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 16,
   },
-  profileInfo: {
-    flex: 1,
-  },
+  profileInfo: { flex: 1 },
   profileName: {
     fontSize: 18,
     fontWeight: "700",
     color: "#333",
     marginBottom: 4,
   },
-  profileEmail: {
-    fontSize: 14,
-    color: "#666",
-  },
-  editButton: {
-    padding: 8,
-  },
+  profileEmail: { fontSize: 14, color: "#666" },
+  editButton: { padding: 8 },
   formContainer: {
     backgroundColor: "#FFF",
     marginHorizontal: 20,
@@ -528,9 +445,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  inputGroup: {
-    marginBottom: 16,
-  },
+  inputGroup: { marginBottom: 16 },
   inputLabel: {
     fontSize: 14,
     fontWeight: "600",
@@ -547,9 +462,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  inputRow: {
-    flexDirection: "row",
-  },
+  inputRow: { flexDirection: "row" },
   requiredNote: {
     fontSize: 12,
     color: "#999",
@@ -584,19 +497,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 16,
   },
-  menuTextContainer: {
-    flex: 1,
-  },
+  menuTextContainer: { flex: 1 },
   menuTitle: {
     fontSize: 16,
     fontWeight: "600",
     color: "#333",
     marginBottom: 2,
   },
-  menuSubtitle: {
-    fontSize: 13,
-    color: "#999",
-  },
+  menuSubtitle: { fontSize: 13, color: "#999" },
   logoutButtonLarge: {
     flexDirection: "row",
     alignItems: "center",
@@ -610,18 +518,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E63946",
   },
-  logoutButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#E63946",
-  },
-  version: {
-    textAlign: "center",
-    fontSize: 12,
-    color: "#999",
-    marginTop: 20,
-  },
-  bottomSpacer: {
-    height: 20,
-  },
+  logoutButtonText: { fontSize: 16, fontWeight: "600", color: "#E63946" },
+  version: { textAlign: "center", fontSize: 12, color: "#999", marginTop: 20 },
+  bottomSpacer: { height: 20 },
 });

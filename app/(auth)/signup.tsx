@@ -14,9 +14,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { clienteAPI } from "../services/api";
+import { clienteAPI } from "../../services/api"; // path ajustado
 import { useUser } from "@/contexts/user-context";
-import { storageService } from "../services/storage";
+import { storageService } from "../../services/storage"; // path ajustado
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -31,24 +31,19 @@ export default function SignUpScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
-    // Validação
     if (!name || !email || !password) {
       Alert.alert("Erro", "Por favor, preencha os campos obrigatórios");
       return;
     }
-
     if (password.length < 6) {
       Alert.alert("Erro", "A senha deve ter no mínimo 6 caracteres");
       return;
     }
-
     if (password !== confirmPassword) {
       Alert.alert("Erro", "As senhas não coincidem");
       return;
     }
-
     setLoading(true);
-
     try {
       const result = await clienteAPI.register({
         nome: name,
@@ -56,9 +51,7 @@ export default function SignUpScreen() {
         senha: password,
         telefone: phone || undefined,
       });
-
       if (result.success && result.cliente) {
-        // Salva e faz login automático
         await storageService.saveCliente(result.cliente);
         const userData = {
           ...result.cliente,
@@ -69,13 +62,8 @@ export default function SignUpScreen() {
           updatedAt: new Date().toISOString(),
         };
         await loginUser(userData);
-
-        // Mostra mensagem de sucesso e redireciona
         Alert.alert("Sucesso! 🎉", "Sua conta foi criada com sucesso!", [
-          {
-            text: "OK",
-            onPress: () => router.replace("/(tabs)" as any),
-          },
+          { text: "OK", onPress: () => router.replace("/(tabs)" as any) },
         ]);
       } else {
         Alert.alert("Erro", result.message || "Erro ao criar conta");
@@ -98,7 +86,6 @@ export default function SignUpScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-
       <View style={styles.header}>
         <TouchableOpacity onPress={handleLogin} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#FFF" />
@@ -106,7 +93,6 @@ export default function SignUpScreen() {
         <Text style={styles.headerTitle}>Cadastro</Text>
         <View style={styles.placeholder} />
       </View>
-
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -115,12 +101,10 @@ export default function SignUpScreen() {
           <View style={styles.iconContainer}>
             <Ionicons name="person-add" size={60} color="#7C3AED" />
           </View>
-
           <Text style={styles.formTitle}>Crie sua conta</Text>
           <Text style={styles.formSubtitle}>
             Preencha os dados abaixo para começar
           </Text>
-
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Nome completo</Text>
             <View style={styles.inputWrapper}>
@@ -139,7 +123,6 @@ export default function SignUpScreen() {
               />
             </View>
           </View>
-
           <View style={styles.inputContainer}>
             <Text style={styles.label}>E-mail</Text>
             <View style={styles.inputWrapper}>
@@ -160,7 +143,6 @@ export default function SignUpScreen() {
               />
             </View>
           </View>
-
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Telefone</Text>
             <View style={styles.inputWrapper}>
@@ -180,7 +162,6 @@ export default function SignUpScreen() {
               />
             </View>
           </View>
-
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Senha</Text>
             <View style={styles.inputWrapper}>
@@ -210,7 +191,6 @@ export default function SignUpScreen() {
               </TouchableOpacity>
             </View>
           </View>
-
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Confirmar senha</Text>
             <View style={styles.inputWrapper}>
@@ -240,7 +220,6 @@ export default function SignUpScreen() {
               </TouchableOpacity>
             </View>
           </View>
-
           <TouchableOpacity
             style={[
               styles.signupButton,
@@ -255,7 +234,6 @@ export default function SignUpScreen() {
               <Text style={styles.signupButtonText}>Criar conta</Text>
             )}
           </TouchableOpacity>
-
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>Já tem uma conta? </Text>
             <TouchableOpacity onPress={handleLogin}>
@@ -267,12 +245,8 @@ export default function SignUpScreen() {
     </KeyboardAvoidingView>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#7C3AED",
-  },
+  container: { flex: 1, backgroundColor: "#7C3AED" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -282,20 +256,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: "#7C3AED",
   },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#FFF",
-  },
-  placeholder: {
-    width: 32,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
+  backButton: { padding: 4 },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#FFF" },
+  placeholder: { width: 32 },
+  scrollContent: { flexGrow: 1 },
   formContainer: {
     flex: 1,
     backgroundColor: "#FFF",
@@ -305,10 +269,7 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     paddingBottom: 24,
   },
-  iconContainer: {
-    alignItems: "center",
-    marginBottom: 24,
-  },
+  iconContainer: { alignItems: "center", marginBottom: 24 },
   formTitle: {
     fontSize: 24,
     fontWeight: "700",
@@ -322,15 +283,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     textAlign: "center",
   },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 8,
-  },
+  inputContainer: { marginBottom: 20 },
+  label: { fontSize: 14, fontWeight: "600", color: "#333", marginBottom: 8 },
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
@@ -339,17 +293,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     height: 52,
   },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: "#333",
-  },
-  eyeIcon: {
-    padding: 4,
-  },
+  inputIcon: { marginRight: 12 },
+  input: { flex: 1, fontSize: 16, color: "#333" },
+  eyeIcon: { padding: 4 },
   signupButton: {
     backgroundColor: "#7C3AED",
     borderRadius: 12,
@@ -363,9 +309,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  signupButtonDisabled: {
-    backgroundColor: "#B8A3E8",
-  },
+  signupButtonDisabled: { backgroundColor: "#B8A3E8" },
   signupButtonText: {
     fontSize: 16,
     fontWeight: "700",
@@ -378,13 +322,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 24,
   },
-  loginText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  loginLink: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#7C3AED",
-  },
+  loginText: { fontSize: 14, color: "#666" },
+  loginLink: { fontSize: 14, fontWeight: "700", color: "#7C3AED" },
 });

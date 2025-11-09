@@ -1,3 +1,4 @@
+// Order success movido para (account)
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
@@ -8,40 +9,36 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 export default function OrderSuccessScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const orderId = params.orderId as string;
   const total = params.total as string;
-
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#4CAF50" />
-
-      {/* Success Icon */}
+      {" "}
+      <StatusBar barStyle="light-content" backgroundColor="#4CAF50" />{" "}
       <View style={styles.content}>
+        {" "}
         <View style={styles.iconContainer}>
           <Ionicons name="checkmark-circle" size={120} color="#4CAF50" />
-        </View>
-
-        <Text style={styles.title}>Pedido Realizado com Sucesso!</Text>
+        </View>{" "}
+        <Text style={styles.title}>Pedido Realizado com Sucesso!</Text>{" "}
         <Text style={styles.subtitle}>
           Seu pedido foi confirmado e será entregue em breve
-        </Text>
-
+        </Text>{" "}
         <View style={styles.orderInfo}>
+          {" "}
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Número do Pedido</Text>
             <Text style={styles.infoValue}>#{orderId}</Text>
-          </View>
-          <View style={styles.divider} />
+          </View>{" "}
+          <View style={styles.divider} />{" "}
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Valor Total</Text>
             <Text style={styles.infoValueHighlight}>R$ {total}</Text>
-          </View>
-        </View>
-
+          </View>{" "}
+        </View>{" "}
         <View style={styles.messageContainer}>
           <Ionicons
             name="information-circle-outline"
@@ -51,11 +48,10 @@ export default function OrderSuccessScreen() {
           <Text style={styles.messageText}>
             Você pode acompanhar o status do seu pedido na página de pedidos
           </Text>
-        </View>
-      </View>
-
-      {/* Buttons */}
+        </View>{" "}
+      </View>{" "}
       <View style={styles.footer}>
+        {" "}
         <TouchableOpacity
           style={styles.primaryButton}
           onPress={() =>
@@ -64,41 +60,33 @@ export default function OrderSuccessScreen() {
         >
           <Ionicons name="eye-outline" size={24} color="#FFF" />
           <Text style={styles.primaryButtonText}>Acompanhar Pedido</Text>
-        </TouchableOpacity>
-
+        </TouchableOpacity>{" "}
         <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => router.push("/orders" as any)}
         >
           <Ionicons name="receipt-outline" size={24} color="#7C3AED" />
           <Text style={styles.secondaryButtonText}>Ver Meus Pedidos</Text>
-        </TouchableOpacity>
-
+        </TouchableOpacity>{" "}
         <TouchableOpacity
           style={styles.tertiaryButton}
           onPress={() => router.replace("/(tabs)" as any)}
         >
           <Text style={styles.tertiaryButtonText}>Voltar ao Início</Text>
-        </TouchableOpacity>
-      </View>
+        </TouchableOpacity>{" "}
+      </View>{" "}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
+  container: { flex: 1, backgroundColor: "#F5F5F5" },
   content: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,
   },
-  iconContainer: {
-    marginBottom: 30,
-  },
+  iconContainer: { marginBottom: 30 },
   title: {
     fontSize: 26,
     fontWeight: "700",
@@ -130,25 +118,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  infoLabel: {
-    fontSize: 14,
-    color: "#666",
-  },
-  infoValue: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#333",
-  },
-  infoValueHighlight: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#4CAF50",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#E0E0E0",
-    marginVertical: 16,
-  },
+  infoLabel: { fontSize: 14, color: "#666" },
+  infoValue: { fontSize: 18, fontWeight: "700", color: "#333" },
+  infoValueHighlight: { fontSize: 24, fontWeight: "700", color: "#4CAF50" },
+  divider: { height: 1, backgroundColor: "#E0E0E0", marginVertical: 16 },
   messageContainer: {
     flexDirection: "row",
     backgroundColor: "#F0E7FF",
@@ -158,12 +131,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#7C3AED",
   },
-  messageText: {
-    flex: 1,
-    fontSize: 14,
-    color: "#7C3AED",
-    lineHeight: 20,
-  },
+  messageText: { flex: 1, fontSize: 14, color: "#7C3AED", lineHeight: 20 },
   footer: {
     padding: 20,
     gap: 12,
@@ -213,9 +181,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  tertiaryButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#666",
-  },
+  tertiaryButtonText: { fontSize: 16, fontWeight: "600", color: "#666" },
 });

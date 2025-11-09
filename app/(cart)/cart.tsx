@@ -1,9 +1,10 @@
+// Carrinho movido para (cart)
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { useCart } from "@/contexts/cart-context";
 import { produtosAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Image,
   ScrollView,
@@ -13,7 +14,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 interface Produto {
   id: string;
   nome: string;
@@ -21,7 +21,6 @@ interface Produto {
   imagem: string | null;
   estoque: number;
 }
-
 export default function CartScreen() {
   const router = useRouter();
   const {
@@ -30,55 +29,38 @@ export default function CartScreen() {
     getTotalPrice,
     addItem,
   } = useCart();
-
   const [suggestedProducts, setSuggestedProducts] = useState<Produto[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(true);
-
-  useEffect(() => {
-    loadSuggestedProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartItems]);
-
-  const loadSuggestedProducts = async () => {
+  const loadSuggestedProducts = useCallback(async () => {
     try {
       setLoadingSuggestions(true);
       const response = await produtosAPI.getAll();
-
       if (response.success && response.produtos) {
-        // Converte IDs do carrinho para o formato hash
         const cartIds = cartItems.map((item) => item.id);
-
         const available = response.produtos.filter((p: Produto) => {
-          // Converte o ID string do produto para número
           const hashStr = p.id.slice(-10);
           const productId = parseInt(hashStr, 36);
           return !cartIds.includes(productId) && p.estoque > 0;
         });
-
-        // Embaralha e pega até 4 produtos
         const shuffled = available.sort(() => Math.random() - 0.5);
-        const suggestions = shuffled.slice(0, 4);
-        setSuggestedProducts(suggestions);
+        setSuggestedProducts(shuffled.slice(0, 4));
       }
     } catch (error) {
       console.error("Erro ao buscar sugestões:", error);
     } finally {
       setLoadingSuggestions(false);
     }
-  };
-
+  }, [cartItems]);
+  useEffect(() => {
+    loadSuggestedProducts();
+  }, [loadSuggestedProducts]);
   const handleAddSuggestedProduct = (product: Produto) => {
-    // Converte preço para número
     const preco =
       typeof product.preco === "string"
         ? parseFloat(product.preco)
         : product.preco;
-
-    // Converte o ID string (CUID) para número usando hash
-    // Pega os últimos 10 caracteres e converte para base 36
     const hashStr = product.id.slice(-10);
     const productId = parseInt(hashStr, 36);
-
     addItem({
       id: productId,
       name: product.nome,
@@ -86,11 +68,8 @@ export default function CartScreen() {
       image: product.imagem,
       quantity: 1,
     });
-
-    // Recarrega sugestões após adicionar
     loadSuggestedProducts();
   };
-
   const handleUpdateQuantity = (id: number, delta: number) => {
     const item = cartItems.find((i) => i.id === id);
     if (item) {
@@ -100,33 +79,25 @@ export default function CartScreen() {
       }
     }
   };
-
-  const handleLogout = () => {
-    // Aqui você pode adicionar a lógica de logout
-    console.log("Usuário saiu");
-  };
-
   const totalProducts = getTotalPrice();
   const taxes = 0.0;
   const total = totalProducts + taxes;
-
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />
-
-      {/* Header */}
+      {" "}
+      <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />{" "}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Carrinho</Text>
-        <TouchableOpacity onPress={handleLogout}>
+        <TouchableOpacity onPress={() => console.log("Usuário saiu")}>
           <Text style={styles.clearButton}>Sair</Text>
         </TouchableOpacity>
-      </View>
-
+      </View>{" "}
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
+        {" "}
         {cartItems.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Ionicons name="cart-outline" size={80} color="#CCC" />
@@ -134,10 +105,9 @@ export default function CartScreen() {
           </View>
         ) : (
           <>
-            {/* Lista de Produtos */}
             {cartItems.map((item) => (
               <View key={item.id} style={styles.productItem}>
-                {/* Renderizar imagem */}
+                {" "}
                 {!item.image ? (
                   <View style={styles.productImagePlaceholder}>
                     <Text style={styles.productImageEmoji}>📦</Text>
@@ -163,47 +133,47 @@ export default function CartScreen() {
                     style={styles.productImage}
                   />
                 ) : (
-                  <Image source={item.image} style={styles.productImage} />
-                )}
-
+                  <Image
+                    source={item.image as any}
+                    style={styles.productImage}
+                  />
+                )}{" "}
                 <View style={styles.productDetails}>
-                  <Text style={styles.productName}>{item.name}</Text>
+                  {" "}
+                  <Text style={styles.productName}>{item.name}</Text>{" "}
                   <Text style={styles.productPrice}>
                     R$ {item.price.toFixed(2)}
-                  </Text>
-
+                  </Text>{" "}
                   <View style={styles.quantityRow}>
+                    {" "}
                     <TouchableOpacity
                       style={styles.quantityButton}
                       onPress={() => handleUpdateQuantity(item.id, -1)}
                     >
                       <Ionicons name="remove" size={20} color="#FFF" />
-                    </TouchableOpacity>
-
-                    <Text style={styles.quantityText}>{item.quantity}</Text>
-
+                    </TouchableOpacity>{" "}
+                    <Text style={styles.quantityText}>{item.quantity}</Text>{" "}
                     <TouchableOpacity
                       style={styles.quantityButton}
                       onPress={() => handleUpdateQuantity(item.id, 1)}
                     >
                       <Ionicons name="add" size={20} color="#FFF" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
+                    </TouchableOpacity>{" "}
+                  </View>{" "}
+                </View>{" "}
                 <View style={styles.productActions}>
+                  {" "}
                   <TouchableOpacity style={styles.favoriteButton}>
                     <Ionicons name="heart-outline" size={24} color="#666" />
-                  </TouchableOpacity>
+                  </TouchableOpacity>{" "}
                   <TouchableOpacity style={styles.menuButton}>
                     <Ionicons name="ellipsis-vertical" size={24} color="#666" />
-                  </TouchableOpacity>
-                </View>
+                  </TouchableOpacity>{" "}
+                </View>{" "}
               </View>
-            ))}
-
-            {/* Resumo do Pedido */}
+            ))}{" "}
             <View style={styles.summaryContainer}>
+              {" "}
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>
                   Produtos ({cartItems.length})
@@ -211,30 +181,27 @@ export default function CartScreen() {
                 <Text style={styles.summaryValue}>
                   R$ {totalProducts.toFixed(2)}
                 </Text>
-              </View>
-
+              </View>{" "}
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Taxas</Text>
                 <Text style={styles.summaryValue}>R$ {taxes.toFixed(2)}</Text>
-              </View>
-
-              <View style={styles.divider} />
-
+              </View>{" "}
+              <View style={styles.divider} />{" "}
               <View style={styles.summaryRow}>
                 <Text style={styles.totalLabelSmall}>Total</Text>
                 <Text style={styles.totalValueSmall}>
                   R$ {total.toFixed(2)}
                 </Text>
-              </View>
-            </View>
-
-            {/* Sugestões de Produtos */}
+              </View>{" "}
+            </View>{" "}
             <View style={styles.suggestionsContainer}>
-              <Text style={styles.suggestionsTitle}>Sugestões para você</Text>
+              {" "}
+              <Text style={styles.suggestionsTitle}>
+                Sugestões para você
+              </Text>{" "}
               <Text style={styles.suggestionsSubtitle}>
                 Adicione mais itens ao seu carrinho
-              </Text>
-
+              </Text>{" "}
               {loadingSuggestions ? (
                 <View style={styles.suggestionsLoading}>
                   <Text style={styles.suggestionsLoadingText}>
@@ -253,36 +220,28 @@ export default function CartScreen() {
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.suggestionsScroll}
                 >
+                  {" "}
                   {suggestedProducts.map((product) => {
-                    // Converte o ID string para número usando o mesmo método
                     const hashStr = product.id.slice(-10);
                     const productId = parseInt(hashStr, 36);
-
                     const isInCart = cartItems.some(
                       (item) => item.id === productId
                     );
-
-                    // Converter preço para número
                     const preco =
                       typeof product.preco === "string"
                         ? parseFloat(product.preco)
                         : product.preco;
-
-                    // Determinar como renderizar a imagem
                     const renderImage = () => {
-                      if (!product.imagem) {
+                      if (!product.imagem)
                         return (
                           <View style={styles.suggestionImagePlaceholder}>
                             <Text style={styles.suggestionImageEmoji}>📦</Text>
                           </View>
                         );
-                      }
-
-                      // Se for emoji (texto pequeno sem URL)
                       if (
                         product.imagem.length <= 4 &&
                         !product.imagem.startsWith("http")
-                      ) {
+                      )
                         return (
                           <View style={styles.suggestionImagePlaceholder}>
                             <Text style={styles.suggestionImageEmoji}>
@@ -290,20 +249,14 @@ export default function CartScreen() {
                             </Text>
                           </View>
                         );
-                      }
-
-                      // Se for URL completa
-                      if (product.imagem.startsWith("http")) {
+                      if (product.imagem.startsWith("http"))
                         return (
                           <Image
                             source={{ uri: product.imagem }}
                             style={styles.suggestionImage}
                           />
                         );
-                      }
-
-                      // Se for caminho de upload
-                      if (product.imagem.startsWith("/uploads")) {
+                      if (product.imagem.startsWith("/uploads"))
                         return (
                           <Image
                             source={{
@@ -312,25 +265,22 @@ export default function CartScreen() {
                             style={styles.suggestionImage}
                           />
                         );
-                      }
-
                       return (
                         <View style={styles.suggestionImagePlaceholder}>
                           <Text style={styles.suggestionImageEmoji}>📦</Text>
                         </View>
                       );
                     };
-
                     return (
                       <View key={product.id} style={styles.suggestionCard}>
-                        {renderImage()}
+                        {" "}
+                        {renderImage()}{" "}
                         <Text style={styles.suggestionName} numberOfLines={2}>
                           {product.nome}
-                        </Text>
+                        </Text>{" "}
                         <Text style={styles.suggestionPrice}>
                           R$ {preco.toFixed(2)}
-                        </Text>
-
+                        </Text>{" "}
                         <TouchableOpacity
                           style={[
                             styles.addSuggestionButton,
@@ -339,28 +289,26 @@ export default function CartScreen() {
                           onPress={() => handleAddSuggestedProduct(product)}
                           disabled={isInCart}
                         >
+                          {" "}
                           <Ionicons
                             name={isInCart ? "checkmark" : "add"}
                             size={20}
                             color="#FFF"
-                          />
+                          />{" "}
                           <Text style={styles.addSuggestionButtonText}>
                             {isInCart ? "Adicionado" : "Adicionar"}
-                          </Text>
-                        </TouchableOpacity>
+                          </Text>{" "}
+                        </TouchableOpacity>{" "}
                       </View>
                     );
-                  })}
+                  })}{" "}
                 </ScrollView>
-              )}
-            </View>
+              )}{" "}
+            </View>{" "}
           </>
-        )}
-
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
-
-      {/* Botão Finalizar */}
+        )}{" "}
+        <View style={styles.bottomSpacer} />{" "}
+      </ScrollView>{" "}
       {cartItems.length > 0 && (
         <View style={styles.footer}>
           <TouchableOpacity
@@ -370,19 +318,13 @@ export default function CartScreen() {
             <Text style={styles.checkoutButtonText}>FINALIZAR PEDIDO</Text>
           </TouchableOpacity>
         </View>
-      )}
-
-      {/* Barra de Navegação Inferior */}
-      <BottomNavigation active="home" />
+      )}{" "}
+      <BottomNavigation active="home" />{" "}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
+  container: { flex: 1, backgroundColor: "#F5F5F5" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -392,32 +334,16 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     backgroundColor: "#7C3AED",
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#FFF",
-  },
-  clearButton: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FFF",
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingBottom: 20,
-  },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#FFF" },
+  clearButton: { fontSize: 16, fontWeight: "600", color: "#FFF" },
+  content: { flex: 1 },
+  contentContainer: { paddingBottom: 20 },
   emptyContainer: {
     alignItems: "center",
     justifyContent: "center",
     paddingTop: 100,
   },
-  emptyText: {
-    fontSize: 18,
-    color: "#999",
-    marginTop: 20,
-  },
+  emptyText: { fontSize: 18, color: "#999", marginTop: 20 },
   productItem: {
     flexDirection: "row",
     backgroundColor: "#FFF",
@@ -446,13 +372,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 12,
   },
-  productImageEmoji: {
-    fontSize: 40,
-  },
-  productDetails: {
-    flex: 1,
-    justifyContent: "space-between",
-  },
+  productImageEmoji: { fontSize: 40 },
+  productDetails: { flex: 1, justifyContent: "space-between" },
   productName: {
     fontSize: 14,
     fontWeight: "600",
@@ -465,11 +386,7 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 8,
   },
-  quantityRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
+  quantityRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   quantityButton: {
     width: 32,
     height: 32,
@@ -490,12 +407,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     paddingLeft: 8,
   },
-  favoriteButton: {
-    padding: 4,
-  },
-  menuButton: {
-    padding: 4,
-  },
+  favoriteButton: { padding: 4 },
+  menuButton: { padding: 4 },
   summaryContainer: {
     backgroundColor: "#FFF",
     marginHorizontal: 16,
@@ -514,30 +427,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  summaryLabel: {
-    fontSize: 14,
-    color: "#666",
-  },
-  summaryValue: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#E0E0E0",
-    marginVertical: 8,
-  },
-  totalLabelSmall: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#333",
-  },
-  totalValueSmall: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#333",
-  },
+  summaryLabel: { fontSize: 14, color: "#666" },
+  summaryValue: { fontSize: 14, fontWeight: "600", color: "#333" },
+  divider: { height: 1, backgroundColor: "#E0E0E0", marginVertical: 8 },
+  totalLabelSmall: { fontSize: 16, fontWeight: "700", color: "#333" },
+  totalValueSmall: { fontSize: 18, fontWeight: "700", color: "#333" },
   footer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
@@ -562,9 +456,7 @@ const styles = StyleSheet.create({
     color: "#FFF",
     letterSpacing: 0.5,
   },
-  bottomSpacer: {
-    height: 20,
-  },
+  bottomSpacer: { height: 20 },
   suggestionsContainer: {
     backgroundColor: "#FFF",
     marginHorizontal: 16,
@@ -583,25 +475,14 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 4,
   },
-  suggestionsSubtitle: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 16,
-  },
-  suggestionsScroll: {
-    gap: 12,
-    paddingRight: 20,
-  },
+  suggestionsSubtitle: { fontSize: 14, color: "#666", marginBottom: 16 },
+  suggestionsScroll: { gap: 12, paddingRight: 20 },
   suggestionsLoading: {
     paddingVertical: 40,
     alignItems: "center",
     justifyContent: "center",
   },
-  suggestionsLoadingText: {
-    fontSize: 14,
-    color: "#999",
-    fontStyle: "italic",
-  },
+  suggestionsLoadingText: { fontSize: 14, color: "#999", fontStyle: "italic" },
   suggestionCard: {
     width: 140,
     backgroundColor: "#F9F9F9",
@@ -625,9 +506,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 8,
   },
-  suggestionImageEmoji: {
-    fontSize: 40,
-  },
+  suggestionImageEmoji: { fontSize: 40 },
   suggestionName: {
     fontSize: 13,
     fontWeight: "600",
@@ -650,12 +529,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     gap: 4,
   },
-  addSuggestionButtonDisabled: {
-    backgroundColor: "#4CAF50",
-  },
-  addSuggestionButtonText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#FFF",
-  },
+  addSuggestionButtonDisabled: { backgroundColor: "#4CAF50" },
+  addSuggestionButtonText: { fontSize: 12, fontWeight: "700", color: "#FFF" },
 });

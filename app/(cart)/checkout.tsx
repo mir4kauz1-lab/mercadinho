@@ -1,3 +1,4 @@
+// Checkout movido para (cart)
 import { useCart } from "@/contexts/cart-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -13,9 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 type PaymentMethod = "credit" | "cash" | "crediario";
-
 export default function CheckoutScreen() {
   const router = useRouter();
   const { items: cartItems, getTotalPrice, clearCart } = useCart();
@@ -24,12 +23,10 @@ export default function CheckoutScreen() {
   const [selectedAddress, setSelectedAddress] = useState("principal");
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState(false);
-
   const subtotal = getTotalPrice();
   const shipping = 12.0;
   const discount = appliedCoupon ? 15.0 : 0;
   const total = subtotal + shipping - discount;
-
   const addresses = [
     {
       id: "principal",
@@ -48,7 +45,6 @@ export default function CheckoutScreen() {
       cep: "01310-100",
     },
   ];
-
   const paymentMethods = [
     {
       id: "credit" as PaymentMethod,
@@ -69,7 +65,6 @@ export default function CheckoutScreen() {
       subtitle: "Parcele no crediário da loja",
     },
   ];
-
   const handleApplyCoupon = () => {
     if (couponCode.toLowerCase() === "santafe10") {
       setAppliedCoupon(true);
@@ -78,46 +73,40 @@ export default function CheckoutScreen() {
       Alert.alert("Erro", "Cupom inválido. Tente: SANTAFE10");
     }
   };
-
   const handleFinishOrder = () => {
-    // Criar ID único do pedido
     const orderId = Math.floor(Math.random() * 900000) + 100000;
-
-    // Redirecionar para página de confirmação
     clearCart();
     router.push(
       `/order-success?orderId=${orderId}&total=${total.toFixed(2)}` as any
     );
   };
-
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-
-      {/* Header */}
+      {" "}
+      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />{" "}
       <View style={styles.header}>
+        {" "}
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={24} color="#FFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Finalizar Pedido</Text>
-        <View style={styles.placeholder} />
-      </View>
-
+        </TouchableOpacity>{" "}
+        <Text style={styles.headerTitle}>Finalizar Pedido</Text>{" "}
+        <View style={styles.placeholder} />{" "}
+      </View>{" "}
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Endereço de Entrega */}
-        <View style={styles.section}>
+        {" "}
+        <View className="section" style={styles.section}>
+          {" "}
           <View style={styles.sectionHeader}>
             <Ionicons name="location" size={24} color="#7C3AED" />
             <Text style={styles.sectionTitle}>Endereço de Entrega</Text>
-          </View>
-
+          </View>{" "}
           {addresses.map((address) => (
             <TouchableOpacity
               key={address.id}
@@ -127,6 +116,7 @@ export default function CheckoutScreen() {
               ]}
               onPress={() => setSelectedAddress(address.id)}
             >
+              {" "}
               <View style={styles.addressInfo}>
                 <Text style={styles.addressLabel}>{address.label}</Text>
                 <Text style={styles.addressText}>{address.street}</Text>
@@ -134,33 +124,31 @@ export default function CheckoutScreen() {
                   {address.district} - {address.city}
                 </Text>
                 <Text style={styles.addressText}>CEP: {address.cep}</Text>
-              </View>
+              </View>{" "}
               <View
                 style={[
                   styles.radioOuter,
                   selectedAddress === address.id && styles.radioOuterSelected,
                 ]}
               >
+                {" "}
                 {selectedAddress === address.id && (
                   <View style={styles.radioInner} />
-                )}
-              </View>
+                )}{" "}
+              </View>{" "}
             </TouchableOpacity>
-          ))}
-
+          ))}{" "}
           <TouchableOpacity style={styles.addAddressButton}>
             <Ionicons name="add-circle-outline" size={20} color="#7C3AED" />
             <Text style={styles.addAddressText}>Adicionar novo endereço</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Forma de Pagamento */}
+          </TouchableOpacity>{" "}
+        </View>{" "}
         <View style={styles.section}>
+          {" "}
           <View style={styles.sectionHeader}>
             <Ionicons name="card" size={24} color="#7C3AED" />
             <Text style={styles.sectionTitle}>Forma de Pagamento</Text>
-          </View>
-
+          </View>{" "}
           {paymentMethods.map((method) => (
             <TouchableOpacity
               key={method.id}
@@ -170,36 +158,36 @@ export default function CheckoutScreen() {
               ]}
               onPress={() => setSelectedPayment(method.id)}
             >
+              {" "}
               <Ionicons
                 name={method.icon as any}
                 size={24}
                 color={selectedPayment === method.id ? "#7C3AED" : "#666"}
-              />
+              />{" "}
               <View style={styles.paymentInfo}>
                 <Text style={styles.paymentTitle}>{method.title}</Text>
                 <Text style={styles.paymentSubtitle}>{method.subtitle}</Text>
-              </View>
+              </View>{" "}
               <View
                 style={[
                   styles.radioOuter,
                   selectedPayment === method.id && styles.radioOuterSelected,
                 ]}
               >
+                {" "}
                 {selectedPayment === method.id && (
                   <View style={styles.radioInner} />
-                )}
-              </View>
+                )}{" "}
+              </View>{" "}
             </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Cupom de Desconto */}
+          ))}{" "}
+        </View>{" "}
         <View style={styles.section}>
+          {" "}
           <View style={styles.sectionHeader}>
             <Ionicons name="pricetag" size={24} color="#7C3AED" />
             <Text style={styles.sectionTitle}>Cupom de Desconto</Text>
-          </View>
-
+          </View>{" "}
           <View style={styles.couponContainer}>
             <TextInput
               style={styles.couponInput}
@@ -221,7 +209,7 @@ export default function CheckoutScreen() {
                 {appliedCoupon ? "Aplicado" : "Aplicar"}
               </Text>
             </TouchableOpacity>
-          </View>
+          </View>{" "}
           {appliedCoupon && (
             <View style={styles.couponSuccess}>
               <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
@@ -229,45 +217,46 @@ export default function CheckoutScreen() {
                 Cupom aplicado! R$ 15,00 de desconto
               </Text>
             </View>
-          )}
-        </View>
-
-        {/* Resumo dos Produtos */}
+          )}{" "}
+        </View>{" "}
         <View style={styles.section}>
+          {" "}
           <View style={styles.sectionHeader}>
             <Ionicons name="cart" size={24} color="#7C3AED" />
             <Text style={styles.sectionTitle}>
               Resumo do Pedido ({cartItems.length}{" "}
               {cartItems.length === 1 ? "item" : "itens"})
             </Text>
-          </View>
-
+          </View>{" "}
           {cartItems.map((item) => (
             <View key={item.id} style={styles.productItem}>
-              <Image source={item.image} style={styles.productImage} />
+              {" "}
+              <Image
+                source={item.image as any}
+                style={styles.productImage}
+              />{" "}
               <View style={styles.productInfo}>
                 <Text style={styles.productName} numberOfLines={2}>
                   {item.name}
                 </Text>
                 <Text style={styles.productQuantity}>Qtd: {item.quantity}</Text>
-              </View>
+              </View>{" "}
               <Text style={styles.productPrice}>
                 R$ {(item.price * item.quantity).toFixed(2)}
-              </Text>
+              </Text>{" "}
             </View>
-          ))}
-        </View>
-
-        {/* Resumo de Valores */}
+          ))}{" "}
+        </View>{" "}
         <View style={styles.summarySection}>
+          {" "}
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Subtotal</Text>
             <Text style={styles.summaryValue}>R$ {subtotal.toFixed(2)}</Text>
-          </View>
+          </View>{" "}
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Frete</Text>
             <Text style={styles.summaryValue}>R$ {shipping.toFixed(2)}</Text>
-          </View>
+          </View>{" "}
           {appliedCoupon && (
             <View style={styles.summaryRow}>
               <Text style={[styles.summaryLabel, styles.discountText]}>
@@ -277,40 +266,34 @@ export default function CheckoutScreen() {
                 - R$ {discount.toFixed(2)}
               </Text>
             </View>
-          )}
-          <View style={styles.divider} />
+          )}{" "}
+          <View style={styles.divider} />{" "}
           <View style={styles.summaryRow}>
             <Text style={styles.totalLabel}>Total</Text>
             <Text style={styles.totalValue}>R$ {total.toFixed(2)}</Text>
-          </View>
-        </View>
-
-        <View style={styles.bottomSpacer} />
-      </ScrollView>
-
-      {/* Footer com botão */}
+          </View>{" "}
+        </View>{" "}
+        <View style={styles.bottomSpacer} />{" "}
+      </ScrollView>{" "}
       <View style={styles.footer}>
+        {" "}
         <View style={styles.footerInfo}>
           <Text style={styles.footerLabel}>Total a pagar</Text>
           <Text style={styles.footerTotal}>R$ {total.toFixed(2)}</Text>
-        </View>
+        </View>{" "}
         <TouchableOpacity
           style={styles.finishButton}
           onPress={handleFinishOrder}
         >
           <Text style={styles.finishButtonText}>Confirmar Pedido</Text>
           <Ionicons name="checkmark-circle" size={24} color="#FFF" />
-        </TouchableOpacity>
-      </View>
+        </TouchableOpacity>{" "}
+      </View>{" "}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
+  container: { flex: 1, backgroundColor: "#F5F5F5" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -320,23 +303,11 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: "#7C3AED",
   },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#FFF",
-  },
-  placeholder: {
-    width: 32,
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingBottom: 20,
-  },
+  backButton: { padding: 4 },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#FFF" },
+  placeholder: { width: 32 },
+  content: { flex: 1 },
+  contentContainer: { paddingBottom: 20 },
   section: {
     backgroundColor: "#FFF",
     marginHorizontal: 16,
@@ -355,11 +326,7 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#333",
-  },
+  sectionTitle: { fontSize: 18, fontWeight: "700", color: "#333" },
   addressCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -370,24 +337,15 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#E0E0E0",
   },
-  addressCardSelected: {
-    borderColor: "#7C3AED",
-    backgroundColor: "#F0E7FF",
-  },
-  addressInfo: {
-    flex: 1,
-  },
+  addressCardSelected: { borderColor: "#7C3AED", backgroundColor: "#F0E7FF" },
+  addressInfo: { flex: 1 },
   addressLabel: {
     fontSize: 16,
     fontWeight: "700",
     color: "#333",
     marginBottom: 6,
   },
-  addressText: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 2,
-  },
+  addressText: { fontSize: 14, color: "#666", marginBottom: 2 },
   radioOuter: {
     width: 24,
     height: 24,
@@ -397,9 +355,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  radioOuterSelected: {
-    borderColor: "#7C3AED",
-  },
+  radioOuterSelected: { borderColor: "#7C3AED" },
   radioInner: {
     width: 12,
     height: 12,
@@ -417,11 +373,7 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderRadius: 12,
   },
-  addAddressText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#7C3AED",
-  },
+  addAddressText: { fontSize: 14, fontWeight: "600", color: "#7C3AED" },
   paymentCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -433,27 +385,16 @@ const styles = StyleSheet.create({
     borderColor: "#E0E0E0",
     gap: 12,
   },
-  paymentCardSelected: {
-    borderColor: "#7C3AED",
-    backgroundColor: "#F0E7FF",
-  },
-  paymentInfo: {
-    flex: 1,
-  },
+  paymentCardSelected: { borderColor: "#7C3AED", backgroundColor: "#F0E7FF" },
+  paymentInfo: { flex: 1 },
   paymentTitle: {
     fontSize: 16,
     fontWeight: "700",
     color: "#333",
     marginBottom: 2,
   },
-  paymentSubtitle: {
-    fontSize: 13,
-    color: "#666",
-  },
-  couponContainer: {
-    flexDirection: "row",
-    gap: 12,
-  },
+  paymentSubtitle: { fontSize: 13, color: "#666" },
+  couponContainer: { flexDirection: "row", gap: 12 },
   couponInput: {
     flex: 1,
     height: 48,
@@ -471,14 +412,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  couponButtonApplied: {
-    backgroundColor: "#4CAF50",
-  },
-  couponButtonText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#FFF",
-  },
+  couponButtonApplied: { backgroundColor: "#4CAF50" },
+  couponButtonText: { fontSize: 14, fontWeight: "700", color: "#FFF" },
   couponSuccess: {
     flexDirection: "row",
     alignItems: "center",
@@ -488,11 +423,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E8F5E9",
     borderRadius: 8,
   },
-  couponSuccessText: {
-    fontSize: 14,
-    color: "#4CAF50",
-    fontWeight: "600",
-  },
+  couponSuccessText: { fontSize: 14, color: "#4CAF50", fontWeight: "600" },
   productItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -506,24 +437,15 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     marginRight: 12,
   },
-  productInfo: {
-    flex: 1,
-  },
+  productInfo: { flex: 1 },
   productName: {
     fontSize: 14,
     fontWeight: "600",
     color: "#333",
     marginBottom: 4,
   },
-  productQuantity: {
-    fontSize: 12,
-    color: "#666",
-  },
-  productPrice: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#7C3AED",
-  },
+  productQuantity: { fontSize: 12, color: "#666" },
+  productPrice: { fontSize: 16, fontWeight: "700", color: "#7C3AED" },
   summarySection: {
     backgroundColor: "#FFF",
     marginHorizontal: 16,
@@ -542,36 +464,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  summaryLabel: {
-    fontSize: 14,
-    color: "#666",
-  },
-  summaryValue: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  discountText: {
-    color: "#4CAF50",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#E0E0E0",
-    marginVertical: 8,
-  },
-  totalLabel: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#333",
-  },
-  totalValue: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#7C3AED",
-  },
-  bottomSpacer: {
-    height: 20,
-  },
+  summaryLabel: { fontSize: 14, color: "#666" },
+  summaryValue: { fontSize: 14, fontWeight: "600", color: "#333" },
+  discountText: { color: "#4CAF50" },
+  divider: { height: 1, backgroundColor: "#E0E0E0", marginVertical: 8 },
+  totalLabel: { fontSize: 18, fontWeight: "700", color: "#333" },
+  totalValue: { fontSize: 22, fontWeight: "700", color: "#7C3AED" },
+  bottomSpacer: { height: 20 },
   footer: {
     backgroundColor: "#FFF",
     padding: 20,
@@ -584,15 +483,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  footerLabel: {
-    fontSize: 14,
-    color: "#666",
-  },
-  footerTotal: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#333",
-  },
+  footerLabel: { fontSize: 14, color: "#666" },
+  footerTotal: { fontSize: 24, fontWeight: "700", color: "#333" },
   finishButton: {
     flexDirection: "row",
     backgroundColor: "#7C3AED",

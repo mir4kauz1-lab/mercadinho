@@ -1,9 +1,10 @@
+// Produto movido para (product)/product
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { useCart } from "@/contexts/cart-context";
 import { produtosAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -15,7 +16,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 interface Produto {
   id: string;
   nome: string;
@@ -24,12 +24,8 @@ interface Produto {
   estoque: number;
   imagem: string | null;
   ativo: boolean;
-  categoria: {
-    id: string;
-    nome: string;
-  };
+  categoria: { id: string; nome: string };
 }
-
 export default function ProductScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -38,17 +34,14 @@ export default function ProductScreen() {
   const [produto, setProduto] = useState<Produto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const loadProduto = async () => {
+  const loadProduto = useCallback(async () => {
     try {
       setLoading(true);
       const response = await produtosAPI.getAll();
-
       if (response.success && response.produtos) {
         const found = response.produtos.find(
           (p: Produto) => p.id === params.id
         );
-
         if (found) {
           setProduto(found);
         } else {
@@ -63,37 +56,24 @@ export default function ProductScreen() {
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [params.id]);
   useEffect(() => {
     loadProduto();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id]);
-
+  }, [loadProduto]);
   const handleDecrement = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    }
+    if (quantity > 1) setQuantity(quantity - 1);
   };
-
   const handleIncrement = () => {
     setQuantity(quantity + 1);
   };
-
   const handleAddToCart = () => {
     if (!produto) return;
-
-    // Converte preço para número
     const preco =
       typeof produto.preco === "string"
         ? parseFloat(produto.preco)
         : produto.preco;
-
-    // Converte o ID string (CUID) para número usando hash
     const hashStr = produto.id.slice(-10);
     const productId = parseInt(hashStr, 36);
-
-    // Adiciona o produto ao carrinho com a quantidade selecionada
     addItem({
       id: productId,
       name: produto.nome,
@@ -101,11 +81,8 @@ export default function ProductScreen() {
       image: produto.imagem,
       quantity: quantity,
     });
-
-    // Navega para a página do carrinho
     router.push("/cart" as any);
   };
-
   if (loading) {
     return (
       <View style={styles.wrapper}>
@@ -119,7 +96,6 @@ export default function ProductScreen() {
       </View>
     );
   }
-
   if (error || !produto) {
     return (
       <View style={styles.wrapper}>
@@ -141,15 +117,11 @@ export default function ProductScreen() {
       </View>
     );
   }
-
-  // Converte preço para número se vier como string
   const preco =
     typeof produto.preco === "string"
       ? parseFloat(produto.preco)
       : produto.preco;
   const totalPrice = preco * quantity;
-
-  // Verifica se é emoji ou URL
   const isEmoji =
     typeof produto.imagem === "string" && produto.imagem.length <= 2;
   const isUrl =
@@ -157,13 +129,10 @@ export default function ProductScreen() {
     (produto.imagem.startsWith("http") ||
       produto.imagem.startsWith("https") ||
       produto.imagem.startsWith("/uploads"));
-
-  // Monta URL completa se for caminho relativo
   const imageUrl =
     typeof produto.imagem === "string" && produto.imagem.startsWith("/uploads")
       ? `https://santafe-dashboard.vercel.app${produto.imagem}`
       : produto.imagem;
-
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -182,7 +151,6 @@ export default function ProductScreen() {
                 <Ionicons name="search" size={24} color="#FFF" />
               </TouchableOpacity>
             </View>
-
             <View style={styles.content}>
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.imageContainer}>
@@ -198,24 +166,19 @@ export default function ProductScreen() {
                     <Ionicons name="image-outline" size={120} color="#DDD" />
                   )}
                 </View>
-
                 <View style={styles.detailsContainer}>
                   <Text style={styles.productName}>{produto.nome}</Text>
-
                   <View style={styles.ratingRow}>
                     <Ionicons name="star" size={16} color="#FFA500" />
                     <Text style={styles.ratingText}>4.9</Text>
                     <Text style={styles.priceText}>R$ {preco.toFixed(2)}</Text>
                   </View>
-
                   <Text style={styles.categoryBadge}>
                     {produto.categoria.nome}
                   </Text>
-
                   {produto.descricao && (
                     <Text style={styles.description}>{produto.descricao}</Text>
                   )}
-
                   <View style={styles.stockInfo}>
                     <Ionicons
                       name={
@@ -237,7 +200,6 @@ export default function ProductScreen() {
                         : "Produto esgotado"}
                     </Text>
                   </View>
-
                   <View style={styles.quantitySection}>
                     <Text style={styles.quantityLabel}>Quantidade</Text>
                     <View style={styles.quantityControls}>
@@ -261,7 +223,6 @@ export default function ProductScreen() {
                 </View>
               </ScrollView>
             </View>
-
             <View style={styles.footer}>
               <View style={styles.totalContainer}>
                 <Text style={styles.totalPrice}>
@@ -283,25 +244,15 @@ export default function ProductScreen() {
             </View>
           </View>
         </SafeAreaView>
-
         <BottomNavigation active="home" />
       </View>
     </>
   );
 }
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    backgroundColor: "#7C3AED",
-  },
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#7C3AED",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
+  wrapper: { flex: 1, backgroundColor: "#7C3AED" },
+  safeArea: { flex: 1, backgroundColor: "#7C3AED" },
+  container: { flex: 1, backgroundColor: "#F5F5F5" },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -310,13 +261,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: "#7C3AED",
   },
-  headerButton: {
-    padding: 8,
-  },
-  content: {
-    flex: 1,
-    backgroundColor: "#FFF",
-  },
+  headerButton: { padding: 8 },
+  content: { flex: 1, backgroundColor: "#FFF" },
   imageContainer: {
     backgroundColor: "#FFF",
     alignItems: "center",
@@ -324,10 +270,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
-  image: {
-    width: "100%",
-    height: 180,
-  },
+  image: { width: "100%", height: 180 },
   detailsContainer: {
     backgroundColor: "#FFF",
     paddingHorizontal: 20,
@@ -346,26 +289,15 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 8,
   },
-  ratingText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  priceText: {
-    fontSize: 14,
-    fontWeight: "400",
-    color: "#666",
-    marginLeft: 8,
-  },
+  ratingText: { fontSize: 14, fontWeight: "600", color: "#333" },
+  priceText: { fontSize: 14, fontWeight: "400", color: "#666", marginLeft: 8 },
   description: {
     fontSize: 12,
     lineHeight: 17,
     color: "#666",
     marginBottom: 12,
   },
-  quantitySection: {
-    marginBottom: 4,
-  },
+  quantitySection: { marginBottom: 4 },
   quantityLabel: {
     fontSize: 14,
     fontWeight: "600",
@@ -409,11 +341,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  totalPrice: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#FFF",
-  },
+  totalPrice: { fontSize: 18, fontWeight: "700", color: "#FFF" },
   addToCartButton: {
     flex: 1,
     backgroundColor: "#333",
@@ -422,27 +350,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  addToCartText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FFF",
-  },
-  centerContent: {
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 16,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: "#666",
-    marginTop: 8,
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#666",
-    marginTop: 8,
-    textAlign: "center",
-  },
+  addToCartText: { fontSize: 16, fontWeight: "600", color: "#FFF" },
+  centerContent: { justifyContent: "center", alignItems: "center", gap: 16 },
+  loadingText: { fontSize: 16, color: "#666", marginTop: 8 },
+  errorText: { fontSize: 16, color: "#666", marginTop: 8, textAlign: "center" },
   backButton: {
     backgroundColor: "#7C3AED",
     paddingHorizontal: 24,
@@ -450,14 +361,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 16,
   },
-  backButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FFF",
-  },
-  emojiImage: {
-    fontSize: 120,
-  },
+  backButtonText: { fontSize: 16, fontWeight: "600", color: "#FFF" },
+  emojiImage: { fontSize: 120 },
   categoryBadge: {
     fontSize: 12,
     fontWeight: "600",
@@ -475,12 +380,6 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 16,
   },
-  stockText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  disabledButton: {
-    backgroundColor: "#999",
-    opacity: 0.5,
-  },
+  stockText: { fontSize: 14, fontWeight: "600" },
+  disabledButton: { backgroundColor: "#999", opacity: 0.5 },
 });

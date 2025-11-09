@@ -6,22 +6,17 @@ import { StyleSheet, Text, View } from "react-native";
 
 export default function SplashScreen() {
   const router = useRouter();
-
   useEffect(() => {
-    // Redireciona para a tela inicial após 3 segundos
     const timer = setTimeout(() => {
       router.replace("/(tabs)");
     }, 3000);
-
     return () => clearTimeout(timer);
   }, [router]);
-
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>SantaFé</Text>
         <Text style={styles.subtitle}>Supermercado</Text>
-
         <View style={styles.cartContainer}>
           <Ionicons name="cart" size={120} color="#FFF" />
         </View>
@@ -29,7 +24,6 @@ export default function SplashScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -37,10 +31,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  content: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  content: { alignItems: "center", justifyContent: "center" },
   title: {
     fontSize: 56,
     fontFamily: Fonts.logo,
@@ -55,7 +46,5 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     letterSpacing: 4,
   },
-  cartContainer: {
-    marginTop: 20,
-  },
+  cartContainer: { marginTop: 20 },
 });

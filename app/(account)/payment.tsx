@@ -1,3 +1,4 @@
+// Movido para (account) sem alterações relevantes
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -9,13 +10,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 type PaymentMethod = "credit" | "cash" | "crediario";
-
 export default function PaymentScreen() {
   const router = useRouter();
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod>("credit");
-
   const paymentMethods = [
     {
       id: "credit" as PaymentMethod,
@@ -39,36 +37,34 @@ export default function PaymentScreen() {
       badge: null,
     },
   ];
-
   const handleConfirm = () => {
     console.log("Método selecionado:", selectedMethod);
     router.back();
   };
-
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
-
-      {/* Header */}
+      {" "}
+      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />{" "}
       <View style={styles.header}>
+        {" "}
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={24} color="#FFF" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Forma de Pagamento</Text>
-        <View style={styles.placeholder} />
-      </View>
-
+        </TouchableOpacity>{" "}
+        <Text style={styles.headerTitle}>Forma de Pagamento</Text>{" "}
+        <View style={styles.placeholder} />{" "}
+      </View>{" "}
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.sectionTitle}>Escolha como pagar</Text>
-
+        {" "}
+        <Text style={styles.sectionTitle}>Escolha como pagar</Text>{" "}
         <View style={styles.methodsContainer}>
+          {" "}
           {paymentMethods.map((method) => (
             <TouchableOpacity
               key={method.id}
@@ -78,42 +74,44 @@ export default function PaymentScreen() {
               ]}
               onPress={() => setSelectedMethod(method.id)}
             >
+              {" "}
               <View style={styles.methodIcon}>
                 <Ionicons
                   name={method.icon as any}
                   size={28}
                   color={selectedMethod === method.id ? "#7C3AED" : "#666"}
                 />
-              </View>
+              </View>{" "}
               <View style={styles.methodInfo}>
+                {" "}
                 <View style={styles.methodTitleRow}>
-                  <Text style={styles.methodTitle}>{method.title}</Text>
+                  {" "}
+                  <Text style={styles.methodTitle}>{method.title}</Text>{" "}
                   {method.badge && (
                     <View style={styles.badge}>
                       <Text style={styles.badgeText}>{method.badge}</Text>
                     </View>
-                  )}
-                </View>
-                <Text style={styles.methodSubtitle}>{method.subtitle}</Text>
-              </View>
+                  )}{" "}
+                </View>{" "}
+                <Text style={styles.methodSubtitle}>{method.subtitle}</Text>{" "}
+              </View>{" "}
               <View
                 style={[
                   styles.radioOuter,
                   selectedMethod === method.id && styles.radioOuterSelected,
                 ]}
               >
+                {" "}
                 {selectedMethod === method.id && (
                   <View style={styles.radioInner} />
-                )}
-              </View>
+                )}{" "}
+              </View>{" "}
             </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Detalhes do método selecionado */}
+          ))}{" "}
+        </View>{" "}
         <View style={styles.detailsContainer}>
-          <Text style={styles.detailsTitle}>Informações</Text>
-
+          {" "}
+          <Text style={styles.detailsTitle}>Informações</Text>{" "}
           {selectedMethod === "credit" && (
             <View style={styles.detailsContent}>
               <Ionicons name="card" size={20} color="#7C3AED" />
@@ -122,8 +120,7 @@ export default function PaymentScreen() {
                 será processado quando você receber seu pedido.
               </Text>
             </View>
-          )}
-
+          )}{" "}
           {selectedMethod === "cash" && (
             <View style={styles.detailsContent}>
               <Ionicons name="cash" size={20} color="#4CAF50" />
@@ -132,8 +129,7 @@ export default function PaymentScreen() {
                 troco disponível.
               </Text>
             </View>
-          )}
-
+          )}{" "}
           {selectedMethod === "crediario" && (
             <View style={styles.detailsContent}>
               <Ionicons name="calendar" size={20} color="#FF9800" />
@@ -142,33 +138,28 @@ export default function PaymentScreen() {
                 disponíveis.
               </Text>
             </View>
-          )}
-        </View>
-
+          )}{" "}
+        </View>{" "}
         <View style={styles.savedCards}>
-          <Text style={styles.savedCardsTitle}>Cartões salvos</Text>
+          {" "}
+          <Text style={styles.savedCardsTitle}>Cartões salvos</Text>{" "}
           <TouchableOpacity style={styles.addCardButton}>
             <Ionicons name="add-circle-outline" size={24} color="#7C3AED" />
             <Text style={styles.addCardText}>Adicionar novo cartão</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-      {/* Footer com botão confirmar */}
+          </TouchableOpacity>{" "}
+        </View>{" "}
+      </ScrollView>{" "}
       <View style={styles.footer}>
+        {" "}
         <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
           <Text style={styles.confirmButtonText}>Confirmar</Text>
-        </TouchableOpacity>
-      </View>
+        </TouchableOpacity>{" "}
+      </View>{" "}
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-  },
+  container: { flex: 1, backgroundColor: "#F5F5F5" },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -178,23 +169,11 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: "#7C3AED",
   },
-  backButton: {
-    padding: 4,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#FFF",
-  },
-  placeholder: {
-    width: 32,
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    paddingBottom: 20,
-  },
+  backButton: { padding: 4 },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: "#FFF" },
+  placeholder: { width: 32 },
+  content: { flex: 1 },
+  contentContainer: { paddingBottom: 20 },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
@@ -203,10 +182,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 16,
   },
-  methodsContainer: {
-    paddingHorizontal: 20,
-    gap: 12,
-  },
+  methodsContainer: { paddingHorizontal: 20, gap: 12 },
   methodCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -216,10 +192,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#E0E0E0",
   },
-  methodCardSelected: {
-    borderColor: "#7C3AED",
-    backgroundColor: "#F0E7FF",
-  },
+  methodCardSelected: { borderColor: "#7C3AED", backgroundColor: "#F0E7FF" },
   methodIcon: {
     width: 48,
     height: 48,
@@ -229,35 +202,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 16,
   },
-  methodInfo: {
-    flex: 1,
-  },
+  methodInfo: { flex: 1 },
   methodTitleRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     marginBottom: 4,
   },
-  methodTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#333",
-  },
+  methodTitle: { fontSize: 16, fontWeight: "700", color: "#333" },
   badge: {
     backgroundColor: "#4CAF50",
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 8,
   },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "#FFF",
-  },
-  methodSubtitle: {
-    fontSize: 13,
-    color: "#666",
-  },
+  badgeText: { fontSize: 10, fontWeight: "700", color: "#FFF" },
+  methodSubtitle: { fontSize: 13, color: "#666" },
   radioOuter: {
     width: 24,
     height: 24,
@@ -267,9 +227,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  radioOuterSelected: {
-    borderColor: "#7C3AED",
-  },
+  radioOuterSelected: { borderColor: "#7C3AED" },
   radioInner: {
     width: 12,
     height: 12,
@@ -289,20 +247,9 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 12,
   },
-  detailsContent: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  detailsText: {
-    flex: 1,
-    fontSize: 14,
-    lineHeight: 20,
-    color: "#666",
-  },
-  savedCards: {
-    marginHorizontal: 20,
-    marginTop: 20,
-  },
+  detailsContent: { flexDirection: "row", gap: 12 },
+  detailsText: { flex: 1, fontSize: 14, lineHeight: 20, color: "#666" },
+  savedCards: { marginHorizontal: 20, marginTop: 20 },
   savedCardsTitle: {
     fontSize: 16,
     fontWeight: "700",
@@ -320,11 +267,7 @@ const styles = StyleSheet.create({
     borderColor: "#E0E0E0",
     borderStyle: "dashed",
   },
-  addCardText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#7C3AED",
-  },
+  addCardText: { fontSize: 14, fontWeight: "600", color: "#7C3AED" },
   footer: {
     padding: 20,
     backgroundColor: "#FFF",
