@@ -3,6 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type TabKey = "home" | "explore" | "credit" | "chat" | "favorites";
 
@@ -20,6 +21,7 @@ export function BottomNavigation({
   const router = useRouter();
   const { getTotalItems } = useCart();
   const itemCount = getTotalItems();
+  const insets = useSafeAreaInsets();
 
   const handleCartPress = () => {
     router.push("/cart" as any);
@@ -31,9 +33,14 @@ export function BottomNavigation({
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.nav}>
+      <View
+        style={[styles.nav, { paddingBottom: Math.max(insets.bottom, 10) }]}
+      >
         <Link href="/(tabs)" asChild>
-          <Pressable style={styles.navItem}>
+          <Pressable
+            style={styles.navItem}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
             <Ionicons
               name="home"
               size={24}
@@ -50,7 +57,10 @@ export function BottomNavigation({
         </Link>
 
         <Link href="/(tabs)/explore" asChild>
-          <Pressable style={styles.navItem}>
+          <Pressable
+            style={styles.navItem}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
             <Ionicons
               name="pricetag-outline"
               size={24}
@@ -67,7 +77,11 @@ export function BottomNavigation({
         </Link>
 
         {/* Carrinho */}
-        <Pressable style={styles.navItem} onPress={handleCartPress}>
+        <Pressable
+          style={styles.navItem}
+          onPress={handleCartPress}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <View>
             <Ionicons name="cart" size={24} color="#E0D4FF" />
             {itemCount > 0 && (
@@ -79,7 +93,11 @@ export function BottomNavigation({
           <Text style={styles.navLabel}>Carrinho</Text>
         </Pressable>
 
-        <Pressable style={styles.navItem} onPress={handleProfilePress}>
+        <Pressable
+          style={styles.navItem}
+          onPress={handleProfilePress}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <Ionicons
             name="person-outline"
             size={24}
@@ -108,9 +126,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#7C3AED",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    paddingVertical: 10,
+    paddingTop: 10,
     paddingHorizontal: 24,
-    paddingBottom: 20,
     alignItems: "flex-end",
     justifyContent: "space-between",
     width: "100%",
@@ -127,6 +144,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 4,
+    paddingVertical: 8,
+    minHeight: 50,
   },
   navLabel: {
     fontSize: 11,
