@@ -83,11 +83,21 @@ export default function ProductScreen() {
   const handleAddToCart = () => {
     if (!produto) return;
 
+    // Converte preço para número
+    const preco =
+      typeof produto.preco === "string"
+        ? parseFloat(produto.preco)
+        : produto.preco;
+
+    // Converte o ID string (CUID) para número usando hash
+    const hashStr = produto.id.slice(-10);
+    const productId = parseInt(hashStr, 36);
+
     // Adiciona o produto ao carrinho com a quantidade selecionada
     addItem({
-      id: parseInt(produto.id) || 0,
+      id: productId,
       name: produto.nome,
-      price: produto.preco,
+      price: preco,
       image: produto.imagem,
       quantity: quantity,
     });
@@ -132,7 +142,12 @@ export default function ProductScreen() {
     );
   }
 
-  const totalPrice = produto.preco * quantity;
+  // Converte preço para número se vier como string
+  const preco =
+    typeof produto.preco === "string"
+      ? parseFloat(produto.preco)
+      : produto.preco;
+  const totalPrice = preco * quantity;
 
   // Verifica se é emoji ou URL
   const isEmoji =
@@ -190,9 +205,7 @@ export default function ProductScreen() {
                   <View style={styles.ratingRow}>
                     <Ionicons name="star" size={16} color="#FFA500" />
                     <Text style={styles.ratingText}>4.9</Text>
-                    <Text style={styles.priceText}>
-                      R$ {produto.preco.toFixed(2)}
-                    </Text>
+                    <Text style={styles.priceText}>R$ {preco.toFixed(2)}</Text>
                   </View>
 
                   <Text style={styles.categoryBadge}>

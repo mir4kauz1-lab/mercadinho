@@ -1,8 +1,9 @@
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { useCart } from "@/contexts/cart-context";
+import { produtosAPI } from "@/services/api";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -13,33 +14,13 @@ import {
   View,
 } from "react-native";
 
-// Produtos sugeridos para adicionar ao carrinho
-const suggestedProducts = [
-  {
-    id: 101,
-    name: "Arroz Tipo 1 5kg",
-    price: 24.99,
-    image: require("@/assets/images/react-logo.png"),
-  },
-  {
-    id: 102,
-    name: "Feijão Preto 1kg",
-    price: 8.99,
-    image: require("@/assets/images/react-logo.png"),
-  },
-  {
-    id: 103,
-    name: "Açúcar Cristal 1kg",
-    price: 4.99,
-    image: require("@/assets/images/react-logo.png"),
-  },
-  {
-    id: 104,
-    name: "Café Torrado 500g",
-    price: 15.99,
-    image: require("@/assets/images/react-logo.png"),
-  },
-];
+interface Produto {
+  id: string;
+  nome: string;
+  preco: number | string;
+  imagem: string | null;
+  estoque: number;
+}
 
 export default function CartScreen() {
   const router = useRouter();
@@ -50,6 +31,66 @@ export default function CartScreen() {
     addItem,
   } = useCart();
 
+  const [suggestedProducts, setSuggestedProducts] = useState<Produto[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(true);
+
+  useEffect(() => {
+    loadSuggestedProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartItems]);
+
+  const loadSuggestedProducts = async () => {
+    try {
+      setLoadingSuggestions(true);
+      const response = await produtosAPI.getAll();
+
+      if (response.success && response.produtos) {
+        // Converte IDs do carrinho para o formato hash
+        const cartIds = cartItems.map((item) => item.id);
+
+        const available = response.produtos.filter((p: Produto) => {
+          // Converte o ID string do produto para número
+          const hashStr = p.id.slice(-10);
+          const productId = parseInt(hashStr, 36);
+          return !cartIds.includes(productId) && p.estoque > 0;
+        });
+
+        // Embaralha e pega até 4 produtos
+        const shuffled = available.sort(() => Math.random() - 0.5);
+        const suggestions = shuffled.slice(0, 4);
+        setSuggestedProducts(suggestions);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar sugestões:", error);
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  };
+
+  const handleAddSuggestedProduct = (product: Produto) => {
+    // Converte preço para número
+    const preco =
+      typeof product.preco === "string"
+        ? parseFloat(product.preco)
+        : product.preco;
+
+    // Converte o ID string (CUID) para número usando hash
+    // Pega os últimos 10 caracteres e converte para base 36
+    const hashStr = product.id.slice(-10);
+    const productId = parseInt(hashStr, 36);
+
+    addItem({
+      id: productId,
+      name: product.nome,
+      price: preco,
+      image: product.imagem,
+      quantity: 1,
+    });
+
+    // Recarrega sugestões após adicionar
+    loadSuggestedProducts();
+  };
+
   const handleUpdateQuantity = (id: number, delta: number) => {
     const item = cartItems.find((i) => i.id === id);
     if (item) {
@@ -58,18 +99,6 @@ export default function CartScreen() {
         updateQuantity(id, newQuantity);
       }
     }
-  };
-
-  const handleAddSuggestedProduct = (
-    product: (typeof suggestedProducts)[0]
-  ) => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: 1,
-    });
   };
 
   const handleLogout = () => {
@@ -108,7 +137,34 @@ export default function CartScreen() {
             {/* Lista de Produtos */}
             {cartItems.map((item) => (
               <View key={item.id} style={styles.productItem}>
-                <Image source={item.image} style={styles.productImage} />
+                {/* Renderizar imagem */}
+                {!item.image ? (
+                  <View style={styles.productImagePlaceholder}>
+                    <Text style={styles.productImageEmoji}>📦</Text>
+                  </View>
+                ) : typeof item.image === "string" &&
+                  item.image.length <= 4 &&
+                  !item.image.startsWith("http") ? (
+                  <View style={styles.productImagePlaceholder}>
+                    <Text style={styles.productImageEmoji}>{item.image}</Text>
+                  </View>
+                ) : typeof item.image === "string" &&
+                  item.image.startsWith("http") ? (
+                  <Image
+                    source={{ uri: item.image }}
+                    style={styles.productImage}
+                  />
+                ) : typeof item.image === "string" &&
+                  item.image.startsWith("/uploads") ? (
+                  <Image
+                    source={{
+                      uri: `https://santafe-dashboard.vercel.app${item.image}`,
+                    }}
+                    style={styles.productImage}
+                  />
+                ) : (
+                  <Image source={item.image} style={styles.productImage} />
+                )}
 
                 <View style={styles.productDetails}>
                   <Text style={styles.productName}>{item.name}</Text>
@@ -172,14 +228,6 @@ export default function CartScreen() {
               </View>
             </View>
 
-            {/* Forma de Pagamento */}
-            <View style={styles.paymentContainer}>
-              <Text style={styles.paymentTitle}>Forma de pagamento</Text>
-              <Text style={styles.paymentMethod}>
-                BOLETO ANTECIPADO - A VISTA
-              </Text>
-            </View>
-
             {/* Sugestões de Produtos */}
             <View style={styles.suggestionsContainer}>
               <Text style={styles.suggestionsTitle}>Sugestões para você</Text>
@@ -187,50 +235,124 @@ export default function CartScreen() {
                 Adicione mais itens ao seu carrinho
               </Text>
 
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.suggestionsScroll}
-              >
-                {suggestedProducts.map((product) => {
-                  const isInCart = cartItems.some(
-                    (item) => item.id === product.id
-                  );
+              {loadingSuggestions ? (
+                <View style={styles.suggestionsLoading}>
+                  <Text style={styles.suggestionsLoadingText}>
+                    Carregando sugestões...
+                  </Text>
+                </View>
+              ) : suggestedProducts.length === 0 ? (
+                <View style={styles.suggestionsLoading}>
+                  <Text style={styles.suggestionsLoadingText}>
+                    Nenhuma sugestão disponível
+                  </Text>
+                </View>
+              ) : (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.suggestionsScroll}
+                >
+                  {suggestedProducts.map((product) => {
+                    // Converte o ID string para número usando o mesmo método
+                    const hashStr = product.id.slice(-10);
+                    const productId = parseInt(hashStr, 36);
 
-                  return (
-                    <View key={product.id} style={styles.suggestionCard}>
-                      <Image
-                        source={product.image}
-                        style={styles.suggestionImage}
-                      />
-                      <Text style={styles.suggestionName} numberOfLines={2}>
-                        {product.name}
-                      </Text>
-                      <Text style={styles.suggestionPrice}>
-                        R$ {product.price.toFixed(2)}
-                      </Text>
+                    const isInCart = cartItems.some(
+                      (item) => item.id === productId
+                    );
 
-                      <TouchableOpacity
-                        style={[
-                          styles.addSuggestionButton,
-                          isInCart && styles.addSuggestionButtonDisabled,
-                        ]}
-                        onPress={() => handleAddSuggestedProduct(product)}
-                        disabled={isInCart}
-                      >
-                        <Ionicons
-                          name={isInCart ? "checkmark" : "add"}
-                          size={20}
-                          color="#FFF"
-                        />
-                        <Text style={styles.addSuggestionButtonText}>
-                          {isInCart ? "Adicionado" : "Adicionar"}
+                    // Converter preço para número
+                    const preco =
+                      typeof product.preco === "string"
+                        ? parseFloat(product.preco)
+                        : product.preco;
+
+                    // Determinar como renderizar a imagem
+                    const renderImage = () => {
+                      if (!product.imagem) {
+                        return (
+                          <View style={styles.suggestionImagePlaceholder}>
+                            <Text style={styles.suggestionImageEmoji}>📦</Text>
+                          </View>
+                        );
+                      }
+
+                      // Se for emoji (texto pequeno sem URL)
+                      if (
+                        product.imagem.length <= 4 &&
+                        !product.imagem.startsWith("http")
+                      ) {
+                        return (
+                          <View style={styles.suggestionImagePlaceholder}>
+                            <Text style={styles.suggestionImageEmoji}>
+                              {product.imagem}
+                            </Text>
+                          </View>
+                        );
+                      }
+
+                      // Se for URL completa
+                      if (product.imagem.startsWith("http")) {
+                        return (
+                          <Image
+                            source={{ uri: product.imagem }}
+                            style={styles.suggestionImage}
+                          />
+                        );
+                      }
+
+                      // Se for caminho de upload
+                      if (product.imagem.startsWith("/uploads")) {
+                        return (
+                          <Image
+                            source={{
+                              uri: `https://santafe-dashboard.vercel.app${product.imagem}`,
+                            }}
+                            style={styles.suggestionImage}
+                          />
+                        );
+                      }
+
+                      return (
+                        <View style={styles.suggestionImagePlaceholder}>
+                          <Text style={styles.suggestionImageEmoji}>📦</Text>
+                        </View>
+                      );
+                    };
+
+                    return (
+                      <View key={product.id} style={styles.suggestionCard}>
+                        {renderImage()}
+                        <Text style={styles.suggestionName} numberOfLines={2}>
+                          {product.nome}
                         </Text>
-                      </TouchableOpacity>
-                    </View>
-                  );
-                })}
-              </ScrollView>
+                        <Text style={styles.suggestionPrice}>
+                          R$ {preco.toFixed(2)}
+                        </Text>
+
+                        <TouchableOpacity
+                          style={[
+                            styles.addSuggestionButton,
+                            isInCart && styles.addSuggestionButtonDisabled,
+                          ]}
+                          onPress={() => handleAddSuggestedProduct(product)}
+                          disabled={isInCart}
+                        >
+                          <Ionicons
+                            name={isInCart ? "checkmark" : "add"}
+                            size={20}
+                            color="#FFF"
+                          />
+                          <Text style={styles.addSuggestionButtonText}>
+                            {isInCart ? "Adicionado" : "Adicionar"}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })}
+                </ScrollView>
+              )}
             </View>
           </>
         )}
@@ -314,6 +436,18 @@ const styles = StyleSheet.create({
     height: 70,
     resizeMode: "contain",
     marginRight: 12,
+  },
+  productImagePlaceholder: {
+    width: 70,
+    height: 70,
+    backgroundColor: "#F5F5F5",
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  productImageEmoji: {
+    fontSize: 40,
   },
   productDetails: {
     flex: 1,
@@ -404,30 +538,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#333",
   },
-  paymentContainer: {
-    backgroundColor: "#FFF",
-    marginHorizontal: 16,
-    marginTop: 16,
-    padding: 20,
-    borderRadius: 12,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  paymentTitle: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 8,
-  },
-  paymentMethod: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#333",
-    textAlign: "center",
-  },
   footer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
@@ -482,6 +592,16 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingRight: 20,
   },
+  suggestionsLoading: {
+    paddingVertical: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  suggestionsLoadingText: {
+    fontSize: 14,
+    color: "#999",
+    fontStyle: "italic",
+  },
   suggestionCard: {
     width: 140,
     backgroundColor: "#F9F9F9",
@@ -495,6 +615,18 @@ const styles = StyleSheet.create({
     height: 80,
     resizeMode: "contain",
     marginBottom: 8,
+  },
+  suggestionImagePlaceholder: {
+    width: "100%",
+    height: 80,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F0F0F0",
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  suggestionImageEmoji: {
+    fontSize: 40,
   },
   suggestionName: {
     fontSize: 13,

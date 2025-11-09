@@ -15,7 +15,6 @@ import {
   View,
 } from "react-native";
 import { clienteAPI } from "../services/api";
-import { storageService } from "../services/storage";
 
 export default function SignUpScreen() {
   const router = useRouter();
@@ -56,16 +55,17 @@ export default function SignUpScreen() {
       });
 
       if (result.success && result.cliente) {
-        // Salva dados do cliente
-        await storageService.saveCliente(result.cliente);
-
-        // Mostra mensagem de sucesso
-        Alert.alert("Sucesso", "Cadastro realizado com sucesso!", [
-          {
-            text: "OK",
-            onPress: () => router.replace("/(tabs)"),
-          },
-        ]);
+        // Mostra mensagem de sucesso e redireciona para login
+        Alert.alert(
+          "Sucesso! 🎉",
+          "Sua conta foi criada com sucesso! Faça login para continuar.",
+          [
+            {
+              text: "OK",
+              onPress: () => router.replace("/login"),
+            },
+          ]
+        );
       } else {
         Alert.alert("Erro", result.message || "Erro ao criar conta");
       }
