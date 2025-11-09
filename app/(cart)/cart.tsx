@@ -84,20 +84,20 @@ export default function CartScreen() {
   const total = totalProducts + taxes;
   return (
     <View style={styles.container}>
-      {" "}
-      <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />{" "}
+      
+      <StatusBar barStyle="light-content" backgroundColor="#FF6B35" />
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Carrinho</Text>
         <TouchableOpacity onPress={() => console.log("Usuário saiu")}>
           <Text style={styles.clearButton}>Sair</Text>
         </TouchableOpacity>
-      </View>{" "}
+      </View>
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {" "}
+        
         {cartItems.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Ionicons name="cart-outline" size={80} color="#CCC" />
@@ -107,7 +107,7 @@ export default function CartScreen() {
           <>
             {cartItems.map((item) => (
               <View key={item.id} style={styles.productItem}>
-                {" "}
+                
                 {!item.image ? (
                   <View style={styles.productImagePlaceholder}>
                     <Text style={styles.productImageEmoji}>📦</Text>
@@ -137,43 +137,43 @@ export default function CartScreen() {
                     source={item.image as any}
                     style={styles.productImage}
                   />
-                )}{" "}
+                )}
                 <View style={styles.productDetails}>
-                  {" "}
-                  <Text style={styles.productName}>{item.name}</Text>{" "}
+                  
+                  <Text style={styles.productName}>{item.name}</Text>
                   <Text style={styles.productPrice}>
                     R$ {item.price.toFixed(2)}
-                  </Text>{" "}
+                  </Text>
                   <View style={styles.quantityRow}>
-                    {" "}
+                    
                     <TouchableOpacity
                       style={styles.quantityButton}
                       onPress={() => handleUpdateQuantity(item.id, -1)}
                     >
                       <Ionicons name="remove" size={20} color="#FFF" />
-                    </TouchableOpacity>{" "}
-                    <Text style={styles.quantityText}>{item.quantity}</Text>{" "}
+                    </TouchableOpacity>
+                    <Text style={styles.quantityText}>{item.quantity}</Text>
                     <TouchableOpacity
                       style={styles.quantityButton}
                       onPress={() => handleUpdateQuantity(item.id, 1)}
                     >
                       <Ionicons name="add" size={20} color="#FFF" />
-                    </TouchableOpacity>{" "}
-                  </View>{" "}
-                </View>{" "}
+                    </TouchableOpacity>
+                  </View>
+                </View>
                 <View style={styles.productActions}>
-                  {" "}
+                  
                   <TouchableOpacity style={styles.favoriteButton}>
                     <Ionicons name="heart-outline" size={24} color="#666" />
-                  </TouchableOpacity>{" "}
+                  </TouchableOpacity>
                   <TouchableOpacity style={styles.menuButton}>
                     <Ionicons name="ellipsis-vertical" size={24} color="#666" />
-                  </TouchableOpacity>{" "}
-                </View>{" "}
+                  </TouchableOpacity>
+                </View>
               </View>
-            ))}{" "}
+            ))}
             <View style={styles.summaryContainer}>
-              {" "}
+              
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>
                   Produtos ({cartItems.length})
@@ -181,27 +181,27 @@ export default function CartScreen() {
                 <Text style={styles.summaryValue}>
                   R$ {totalProducts.toFixed(2)}
                 </Text>
-              </View>{" "}
+              </View>
               <View style={styles.summaryRow}>
                 <Text style={styles.summaryLabel}>Taxas</Text>
                 <Text style={styles.summaryValue}>R$ {taxes.toFixed(2)}</Text>
-              </View>{" "}
-              <View style={styles.divider} />{" "}
+              </View>
+              <View style={styles.divider} />
               <View style={styles.summaryRow}>
                 <Text style={styles.totalLabelSmall}>Total</Text>
                 <Text style={styles.totalValueSmall}>
                   R$ {total.toFixed(2)}
                 </Text>
-              </View>{" "}
-            </View>{" "}
+              </View>
+            </View>
             <View style={styles.suggestionsContainer}>
-              {" "}
+              
               <Text style={styles.suggestionsTitle}>
                 Sugestões para você
-              </Text>{" "}
+              </Text>
               <Text style={styles.suggestionsSubtitle}>
                 Adicione mais itens ao seu carrinho
-              </Text>{" "}
+              </Text>
               {loadingSuggestions ? (
                 <View style={styles.suggestionsLoading}>
                   <Text style={styles.suggestionsLoadingText}>
@@ -220,7 +220,7 @@ export default function CartScreen() {
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.suggestionsScroll}
                 >
-                  {" "}
+                  
                   {suggestedProducts.map((product) => {
                     const hashStr = product.id.slice(-10);
                     const productId = parseInt(hashStr, 36);
@@ -273,14 +273,14 @@ export default function CartScreen() {
                     };
                     return (
                       <View key={product.id} style={styles.suggestionCard}>
-                        {" "}
-                        {renderImage()}{" "}
+                        
+                        {renderImage()}
                         <Text style={styles.suggestionName} numberOfLines={2}>
                           {product.nome}
-                        </Text>{" "}
+                        </Text>
                         <Text style={styles.suggestionPrice}>
                           R$ {preco.toFixed(2)}
-                        </Text>{" "}
+                        </Text>
                         <TouchableOpacity
                           style={[
                             styles.addSuggestionButton,
@@ -289,26 +289,26 @@ export default function CartScreen() {
                           onPress={() => handleAddSuggestedProduct(product)}
                           disabled={isInCart}
                         >
-                          {" "}
+                          
                           <Ionicons
                             name={isInCart ? "checkmark" : "add"}
                             size={20}
                             color="#FFF"
-                          />{" "}
+                          />
                           <Text style={styles.addSuggestionButtonText}>
                             {isInCart ? "Adicionado" : "Adicionar"}
-                          </Text>{" "}
-                        </TouchableOpacity>{" "}
+                          </Text>
+                        </TouchableOpacity>
                       </View>
                     );
-                  })}{" "}
+                  })}
                 </ScrollView>
-              )}{" "}
-            </View>{" "}
+              )}
+            </View>
           </>
-        )}{" "}
-        <View style={styles.bottomSpacer} />{" "}
-      </ScrollView>{" "}
+        )}
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
       {cartItems.length > 0 && (
         <View style={styles.footer}>
           <TouchableOpacity
@@ -318,8 +318,8 @@ export default function CartScreen() {
             <Text style={styles.checkoutButtonText}>FINALIZAR PEDIDO</Text>
           </TouchableOpacity>
         </View>
-      )}{" "}
-      <BottomNavigation active="home" />{" "}
+      )}
+      <BottomNavigation active="home" />
     </View>
   );
 }
@@ -532,3 +532,4 @@ const styles = StyleSheet.create({
   addSuggestionButtonDisabled: { backgroundColor: "#4CAF50" },
   addSuggestionButtonText: { fontSize: 12, fontWeight: "700", color: "#FFF" },
 });
+
