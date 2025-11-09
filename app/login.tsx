@@ -16,9 +16,11 @@ import {
 } from "react-native";
 import { clienteAPI } from "../services/api";
 import { storageService } from "../services/storage";
+import { useUser } from "@/contexts/user-context";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login: loginUser } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -37,11 +39,21 @@ export default function LoginScreen() {
       const result = await clienteAPI.login(email, password);
 
       if (result.success && result.cliente) {
-        // Salva dados do cliente
+        // Salva dados do cliente no contexto e storage
         await storageService.saveCliente(result.cliente);
+        // Converte ClienteData para UserData adicionando campos faltantes
+        const userData = {
+          ...result.cliente,
+          cpf: null,
+          cidade: null,
+          estado: null,
+          cep: null,
+          updatedAt: new Date().toISOString(),
+        };
+        await loginUser(userData);
 
         // Redireciona para home
-        router.replace("/(tabs)");
+        router.replace("/(tabs)" as any);
       } else {
         Alert.alert("Erro", result.message || "Erro ao fazer login");
       }

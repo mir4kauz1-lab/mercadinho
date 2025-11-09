@@ -15,9 +15,12 @@ import {
   View,
 } from "react-native";
 import { clienteAPI } from "../services/api";
+import { useUser } from "@/contexts/user-context";
+import { storageService } from "../services/storage";
 
 export default function SignUpScreen() {
   const router = useRouter();
+  const { login: loginUser } = useUser();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -55,17 +58,25 @@ export default function SignUpScreen() {
       });
 
       if (result.success && result.cliente) {
-        // Mostra mensagem de sucesso e redireciona para login
-        Alert.alert(
-          "Sucesso! 🎉",
-          "Sua conta foi criada com sucesso! Faça login para continuar.",
-          [
-            {
-              text: "OK",
-              onPress: () => router.replace("/login"),
-            },
-          ]
-        );
+        // Salva e faz login automático
+        await storageService.saveCliente(result.cliente);
+        const userData = {
+          ...result.cliente,
+          cpf: null,
+          cidade: null,
+          estado: null,
+          cep: null,
+          updatedAt: new Date().toISOString(),
+        };
+        await loginUser(userData);
+
+        // Mostra mensagem de sucesso e redireciona
+        Alert.alert("Sucesso! 🎉", "Sua conta foi criada com sucesso!", [
+          {
+            text: "OK",
+            onPress: () => router.replace("/(tabs)" as any),
+          },
+        ]);
       } else {
         Alert.alert("Erro", result.message || "Erro ao criar conta");
       }

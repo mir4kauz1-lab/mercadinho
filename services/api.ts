@@ -211,8 +211,76 @@ export const categoriasAPI = {
   },
 };
 
+// Interface para dados do usuário
+export interface UserData {
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string | null;
+  cpf: string | null;
+  endereco: string | null;
+  cidade: string | null;
+  estado: string | null;
+  cep: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Serviço de usuário/perfil
+export const userAPI = {
+  // Buscar dados do usuário
+  getUser: async (
+    userId: string
+  ): Promise<{ success: boolean; cliente?: UserData; message?: string }> => {
+    try {
+      const response = await fetch(`${API_URL}/user/${userId}`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Erro ao buscar usuário:", error);
+      return {
+        success: false,
+        message: "Erro ao conectar com o servidor",
+      };
+    }
+  },
+
+  // Atualizar dados do usuário
+  updateUser: async (dados: {
+    id: string;
+    nome: string;
+    email: string;
+    telefone?: string;
+    cpf?: string;
+    endereco?: string;
+    cidade?: string;
+    estado?: string;
+    cep?: string;
+  }): Promise<{ success: boolean; message: string; cliente?: UserData }> => {
+    try {
+      const response = await fetch(`${API_URL}/user/${dados.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dados),
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+      return {
+        success: false,
+        message: "Erro ao conectar com o servidor",
+      };
+    }
+  },
+};
+
 export default {
   clienteAPI,
   produtosAPI,
   categoriasAPI,
+  userAPI,
 };
