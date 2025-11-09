@@ -1,266 +1,252 @@
-// Orders movido para (account)
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React from "react";
+import { useState, useEffect } from "react";
 import {
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
-type OrderStatus = "preparing" | "on-way" | "delivered" | "cancelled";
-interface Order {
+import { useRouter } from "expo-router";
+import { useUser } from "@/contexts/user-context";
+import api from "@/services/api";
+
+interface ItemPedido {
   id: string;
-  date: string;
-  total: number;
-  status: OrderStatus;
-  items: number;
-  paymentMethod: string;
+  quantidade: number;
+  precoUnitario: number;
+  produto: {
+    nome: string;
+    imagem: string | null;
+  };
 }
+
+interface Pedido {
+  id: string;
+  status: string;
+  total: number;
+  createdAt: string;
+  itens: ItemPedido[];
+}
+
 export default function OrdersScreen() {
   const router = useRouter();
-  const orders: Order[] = [
-    {
-      id: "847291",
-      date: "08/11/2025 - 14:30",
-      total: 157.89,
-      status: "on-way",
-      items: 5,
-      paymentMethod: "Cartão de Crédito",
-    },
-    {
-      id: "836452",
-      date: "06/11/2025 - 10:15",
-      total: 89.5,
-      status: "delivered",
-      items: 3,
-      paymentMethod: "Dinheiro",
-    },
-    {
-      id: "825103",
-      date: "04/11/2025 - 16:45",
-      total: 234.7,
-      status: "delivered",
-      items: 8,
-      paymentMethod: "Crediário",
-    },
-    {
-      id: "814687",
-      date: "02/11/2025 - 09:20",
-      total: 67.3,
-      status: "cancelled",
-      items: 2,
-      paymentMethod: "Cartão de Crédito",
-    },
-  ];
-  const getStatusInfo = (status: OrderStatus) => {
-    switch (status) {
-      case "preparing":
-        return {
-          label: "Sendo Preparado",
-          color: "#FF9800",
-          icon: "cube-outline" as const,
-          bgColor: "#FFF3E0",
-        };
-      case "on-way":
-        return {
-          label: "A Caminho",
-          color: "#2196F3",
-          icon: "car-outline" as const,
-          bgColor: "#E3F2FD",
-        };
-      case "delivered":
-        return {
-          label: "Entregue",
-          color: "#4CAF50",
-          icon: "checkmark-circle-outline" as const,
-          bgColor: "#E8F5E9",
-        };
-      case "cancelled":
-        return {
-          label: "Cancelado",
-          color: "#F44336",
-          icon: "close-circle-outline" as const,
-          bgColor: "#FFEBEE",
-        };
+  const { user } = useUser();
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadPedidos = async () => {
+    if (!user) return;
+
+    try {
+      // Buscar pedidos do cliente
+      const response = await api.get(`/pedidos?clienteId=${user.id}`);
+      if (response.data.success) {
+        setPedidos(response.data.pedidos);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar pedidos:", error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
   };
-  return (
-    <View style={styles.container}>
-      {" "}
-      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />{" "}
-      <View style={styles.header}>
-        {" "}
+
+  useEffect(() => {
+    loadPedidos();
+  }, [user]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadPedidos();
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PENDENTE":
+        return "bg-yellow-100 text-yellow-700";
+      case "EM_ANDAMENTO":
+        return "bg-purple-100 text-purple-700";
+      case "ENTREGUE":
+        return "bg-green-100 text-green-700";
+      case "CANCELADO":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const getStatusTexto = (status: string) => {
+    switch (status) {
+      case "PENDENTE":
+        return "Pendente";
+      case "EM_ANDAMENTO":
+        return "Em Separação";
+      case "ENTREGUE":
+        return "Entregue";
+      case "CANCELADO":
+        return "Cancelado";
+      default:
+        return status;
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "PENDENTE":
+        return "⏳";
+      case "EM_ANDAMENTO":
+        return "📦";
+      case "ENTREGUE":
+        return "✅";
+      case "CANCELADO":
+        return "❌";
+      default:
+        return "📋";
+    }
+  };
+
+  if (!user) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-50 p-6">
+        <Text className="text-2xl font-bold text-gray-900 mb-4">
+          Faça login para ver seus pedidos
+        </Text>
         <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
+          onPress={() => router.push("/(auth)/login")}
+          className="bg-violet-600 px-8 py-4 rounded-xl"
         >
-          <Ionicons name="arrow-back" size={24} color="#FFF" />
-        </TouchableOpacity>{" "}
-        <Text style={styles.headerTitle}>Meus Pedidos</Text>{" "}
-        <View style={styles.placeholder} />{" "}
-      </View>{" "}
+          <Text className="text-white font-semibold text-lg">Fazer Login</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-gray-50">
+        <ActivityIndicator size="large" color="#7C3AED" />
+        <Text className="text-gray-600 mt-4">Carregando pedidos...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View className="flex-1 bg-gray-50">
+      {/* Header */}
+      <View className="bg-violet-600 pt-16 pb-8 px-6">
+        <TouchableOpacity onPress={() => router.back()} className="mb-4">
+          <Text className="text-white text-3xl">←</Text>
+        </TouchableOpacity>
+        <Text className="text-white text-3xl font-bold">Meus Pedidos</Text>
+        <Text className="text-white/80 mt-2">
+          {pedidos.length} {pedidos.length === 1 ? "pedido" : "pedidos"}
+        </Text>
+      </View>
+
       <ScrollView
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
+        className="flex-1 px-6 py-6"
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#7C3AED"
+            colors={["#7C3AED"]}
+          />
+        }
       >
-        {" "}
-        {orders.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Ionicons name="receipt-outline" size={80} color="#CCC" />
-            <Text style={styles.emptyText}>Nenhum pedido realizado</Text>
-            <Text style={styles.emptySubtext}>
-              Seus pedidos aparecerão aqui
+        {pedidos.length === 0 ? (
+          <View className="bg-white rounded-2xl p-12 items-center">
+            <Text className="text-6xl mb-4">🛒</Text>
+            <Text className="text-xl font-bold text-gray-900 mb-2">
+              Nenhum pedido ainda
             </Text>
+            <Text className="text-gray-600 text-center mb-6">
+              Comece fazendo seu primeiro pedido!
+            </Text>
+            <TouchableOpacity
+              onPress={() => router.push("/(tabs)")}
+              className="bg-violet-600 px-8 py-4 rounded-xl"
+            >
+              <Text className="text-white font-semibold">
+                Começar a Comprar
+              </Text>
+            </TouchableOpacity>
           </View>
         ) : (
-          orders.map((order) => {
-            const statusInfo = getStatusInfo(order.status);
-            return (
+          <View className="space-y-4">
+            {pedidos.map((pedido: Pedido) => (
               <TouchableOpacity
-                key={order.id}
-                style={styles.orderCard}
+                key={pedido.id}
                 onPress={() =>
-                  router.push(`/order-tracking?orderId=${order.id}` as any)
+                  router.push(`/(account)/order-tracking?id=${pedido.id}`)
                 }
+                className="bg-white rounded-2xl p-6 shadow-sm active:opacity-80"
               >
-                {" "}
-                <View style={styles.orderHeader}>
-                  {" "}
-                  <View style={styles.orderIdContainer}>
-                    <Text style={styles.orderIdLabel}>Pedido</Text>
-                    <Text style={styles.orderIdValue}>#{order.id}</Text>
-                  </View>{" "}
+                <View className="flex-row items-center justify-between mb-4">
+                  <View className="flex-row items-center gap-3">
+                    <Text className="text-3xl">
+                      {getStatusIcon(pedido.status)}
+                    </Text>
+                    <View>
+                      <Text className="text-lg font-bold text-gray-900">
+                        Pedido #{pedido.id.substring(0, 8)}
+                      </Text>
+                      <Text className="text-gray-600 text-sm">
+                        {new Date(pedido.createdAt).toLocaleDateString("pt-BR")}
+                      </Text>
+                    </View>
+                  </View>
                   <View
-                    style={[
-                      styles.statusBadge,
-                      { backgroundColor: statusInfo.bgColor },
-                    ]}
+                    className={`px-4 py-2 rounded-full ${getStatusColor(
+                      pedido.status
+                    )}`}
                   >
-                    <Ionicons
-                      name={statusInfo.icon}
-                      size={16}
-                      color={statusInfo.color}
-                    />
-                    <Text
-                      style={[styles.statusText, { color: statusInfo.color }]}
-                    >
-                      {statusInfo.label}
+                    <Text className="text-xs font-medium">
+                      {getStatusTexto(pedido.status)}
                     </Text>
-                  </View>{" "}
-                </View>{" "}
-                <View style={styles.orderDivider} />{" "}
-                <View style={styles.orderDetails}>
-                  {" "}
-                  <View style={styles.detailRow}>
-                    <Ionicons name="calendar-outline" size={18} color="#666" />
-                    <Text style={styles.detailText}>{order.date}</Text>
-                  </View>{" "}
-                  <View style={styles.detailRow}>
-                    <Ionicons name="cart-outline" size={18} color="#666" />
-                    <Text style={styles.detailText}>
-                      {order.items} {order.items === 1 ? "item" : "itens"}
+                  </View>
+                </View>
+
+                <View className="border-t border-gray-100 pt-4">
+                  <View className="mb-3">
+                    {pedido.itens
+                      .slice(0, 2)
+                      .map((item: ItemPedido, index: number) => (
+                        <Text
+                          key={index}
+                          className="text-gray-700 text-sm mb-1"
+                        >
+                          {item.quantidade}x {item.produto.nome}
+                        </Text>
+                      ))}
+                    {pedido.itens.length > 2 && (
+                      <Text className="text-gray-500 text-sm">
+                        +{pedido.itens.length - 2}{" "}
+                        {pedido.itens.length - 2 === 1 ? "item" : "itens"}
+                      </Text>
+                    )}
+                  </View>
+
+                  <View className="flex-row items-center justify-between">
+                    <Text className="text-violet-600 font-bold text-lg">
+                      R$ {pedido.total.toFixed(2)}
                     </Text>
-                  </View>{" "}
-                  <View style={styles.detailRow}>
-                    <Ionicons name="card-outline" size={18} color="#666" />
-                    <Text style={styles.detailText}>{order.paymentMethod}</Text>
-                  </View>{" "}
-                </View>{" "}
-                <View style={styles.orderFooter}>
-                  {" "}
-                  <View>
-                    <Text style={styles.totalLabel}>Total</Text>
-                    <Text style={styles.totalValue}>
-                      R$ {order.total.toFixed(2)}
-                    </Text>
-                  </View>{" "}
-                  <TouchableOpacity style={styles.viewButton}>
-                    <Text style={styles.viewButtonText}>Ver Detalhes</Text>
-                    <Ionicons
-                      name="chevron-forward"
-                      size={20}
-                      color="#7C3AED"
-                    />
-                  </TouchableOpacity>{" "}
-                </View>{" "}
+                    <View className="flex-row items-center gap-2">
+                      <Text className="text-gray-600 text-sm">
+                        Ver detalhes
+                      </Text>
+                      <Text className="text-gray-400">→</Text>
+                    </View>
+                  </View>
+                </View>
               </TouchableOpacity>
-            );
-          })
-        )}{" "}
-      </ScrollView>{" "}
+            ))}
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 }
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F5F5" },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
-    backgroundColor: "#7C3AED",
-  },
-  backButton: { padding: 4 },
-  headerTitle: { fontSize: 20, fontWeight: "700", color: "#FFF" },
-  placeholder: { width: 32 },
-  content: { flex: 1 },
-  contentContainer: { padding: 16 },
-  emptyContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 100,
-  },
-  emptyText: { fontSize: 20, fontWeight: "700", color: "#999", marginTop: 20 },
-  emptySubtext: { fontSize: 14, color: "#CCC", marginTop: 8 },
-  orderCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  orderHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  orderIdContainer: { flexDirection: "row", alignItems: "baseline", gap: 6 },
-  orderIdLabel: { fontSize: 14, color: "#666" },
-  orderIdValue: { fontSize: 18, fontWeight: "700", color: "#333" },
-  statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 6,
-  },
-  statusText: { fontSize: 12, fontWeight: "700" },
-  orderDivider: { height: 1, backgroundColor: "#E0E0E0", marginBottom: 16 },
-  orderDetails: { gap: 12, marginBottom: 16 },
-  detailRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  detailText: { fontSize: 14, color: "#666" },
-  orderFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#F0F0F0",
-  },
-  totalLabel: { fontSize: 12, color: "#666", marginBottom: 4 },
-  totalValue: { fontSize: 20, fontWeight: "700", color: "#7C3AED" },
-  viewButton: { flexDirection: "row", alignItems: "center", gap: 4 },
-  viewButtonText: { fontSize: 14, fontWeight: "600", color: "#7C3AED" },
-});
