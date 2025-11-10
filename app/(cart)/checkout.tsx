@@ -11,9 +11,10 @@ import {
   StatusBar,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useCart } from "@/contexts/cart-context";
 import { useUser } from "@/contexts/user-context";
-import { Ionicons } from "@expo/vector-icons";
+import { storageService } from "@/services/storage";
 
 export default function CheckoutScreen() {
   const router = useRouter();
@@ -76,23 +77,13 @@ export default function CheckoutScreen() {
         response.status === 404 &&
         data.message?.includes("Cliente não encontrado")
       ) {
+        await storageService.removeCliente();
+        await logout();
         Alert.alert(
           "Sessão Inválida",
-          "Seus dados de login estão desatualizados. Por favor, faça login novamente.",
-          [
-            {
-              text: "OK",
-              onPress: async () => {
-                // Limpa todos os dados de autenticação
-                const storageService = (await import("@/services/storage"))
-                  .default;
-                await storageService.removeCliente(); // Remove do storage antigo
-                await logout(); // Remove do UserContext
-                router.replace("/(auth)/login");
-              },
-            },
-          ]
+          "Seus dados de login estão desatualizados. Por favor, faça login novamente."
         );
+        router.replace("/(auth)/login");
         return;
       }
 

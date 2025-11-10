@@ -8,10 +8,12 @@ import {
   RefreshControl,
   StyleSheet,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useUser } from "@/contexts/user-context";
 import { Ionicons } from "@expo/vector-icons";
+import { storageService } from "@/services/storage";
 
 interface ItemPedido {
   id: string;
@@ -54,10 +56,12 @@ export default function OrdersScreen() {
           data.pedidos.length === 0 &&
           data.message?.includes("não encontrado"))
       ) {
-        // Limpa autenticação silenciosamente e redireciona
-        const storageService = (await import("@/services/storage")).default;
         await storageService.removeCliente();
         await logout();
+        Alert.alert(
+          "Sessão expirada",
+          "Faça login novamente para visualizar seus pedidos."
+        );
         router.replace("/(auth)/login");
         return;
       }
