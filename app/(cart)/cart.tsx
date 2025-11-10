@@ -65,6 +65,7 @@ export default function CartScreen() {
     const productId = parseInt(hashStr, 36);
     addItem({
       id: productId,
+      productId: product.id, // UUID original
       name: product.nome,
       price: preco,
       image: product.imagem,

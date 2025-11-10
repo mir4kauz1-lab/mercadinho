@@ -62,7 +62,7 @@ export default function CheckoutScreen() {
           body: JSON.stringify({
             clienteId: user.id,
             itens: items.map((item) => ({
-              produtoId: String(item.id),
+              produtoId: item.productId, // Usa UUID original do produto
               quantidade: item.quantity,
             })),
           }),

@@ -77,6 +77,7 @@ export default function ProductScreen() {
     const productId = parseInt(hashStr, 36);
     addItem({
       id: productId,
+      productId: produto.id, // UUID original
       name: produto.nome,
       price: preco,
       image: produto.imagem,
