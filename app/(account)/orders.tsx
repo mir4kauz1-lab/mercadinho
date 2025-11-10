@@ -33,7 +33,7 @@ interface Pedido {
 
 export default function OrdersScreen() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -47,6 +47,21 @@ export default function OrdersScreen() {
       );
       const data = await response.json();
 
+      // Se o cliente não foi encontrado (404), redireciona para login
+      if (
+        response.status === 404 ||
+        (data.pedidos &&
+          data.pedidos.length === 0 &&
+          data.message?.includes("não encontrado"))
+      ) {
+        // Limpa autenticação silenciosamente e redireciona
+        const storageService = (await import("@/services/storage")).default;
+        await storageService.removeCliente();
+        await logout();
+        router.replace("/(auth)/login");
+        return;
+      }
+
       if (data.success) {
         setPedidos(data.pedidos);
       }
@@ -56,7 +71,7 @@ export default function OrdersScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [user]);
+  }, [user, logout, router]);
 
   useEffect(() => {
     loadPedidos();

@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 export default function CheckoutScreen() {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCart();
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const [loading, setLoading] = useState(false);
   const [endereco, setEndereco] = useState(user?.endereco || "");
   const [telefone, setTelefone] = useState(user?.telefone || "");
@@ -70,6 +70,31 @@ export default function CheckoutScreen() {
       );
 
       const data = await response.json();
+
+      // Se o cliente não foi encontrado (404), significa que os dados estão desatualizados
+      if (
+        response.status === 404 &&
+        data.message?.includes("Cliente não encontrado")
+      ) {
+        Alert.alert(
+          "Sessão Inválida",
+          "Seus dados de login estão desatualizados. Por favor, faça login novamente.",
+          [
+            {
+              text: "OK",
+              onPress: async () => {
+                // Limpa todos os dados de autenticação
+                const storageService = (await import("@/services/storage"))
+                  .default;
+                await storageService.removeCliente(); // Remove do storage antigo
+                await logout(); // Remove do UserContext
+                router.replace("/(auth)/login");
+              },
+            },
+          ]
+        );
+        return;
+      }
 
       if (data.success) {
         clearCart();

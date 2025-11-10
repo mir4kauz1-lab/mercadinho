@@ -3,15 +3,28 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useUser } from "@/contexts/user-context";
 
 export default function SplashScreen() {
   const router = useRouter();
+  const { user, isLoading } = useUser();
+
   useEffect(() => {
+    // Aguarda o carregamento do contexto de usuário
+    if (isLoading) return;
+
     const timer = setTimeout(() => {
-      router.replace("/(tabs)");
-    }, 3000);
+      // Se tem usuário logado, vai para tabs (home)
+      // Se não tem, vai para login
+      if (user) {
+        router.replace("/(tabs)");
+      } else {
+        router.replace("/(auth)/login");
+      }
+    }, 2000);
+
     return () => clearTimeout(timer);
-  }, [router]);
+  }, [router, user, isLoading]);
   return (
     <View style={styles.container}>
       <View style={styles.content}>
