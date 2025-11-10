@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,12 +8,11 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useUser } from "@/contexts/user-context";
-import api from "@/services/api";
 
 interface ItemPedido {
   id: string;
   quantidade: number;
-  precoUnitario: number;
+  precoUnit: number;
   produto: {
     nome: string;
     imagem: string | null;
@@ -42,24 +41,27 @@ export default function OrderTrackingScreen() {
   const [pedido, setPedido] = useState<Pedido | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadPedido();
-  }, [id]);
-
-  const loadPedido = async () => {
+  const loadPedido = useCallback(async () => {
     if (!id || !user) return;
 
     try {
-      const response = await api.get(`/pedidos/${id}`);
-      if (response.data.success) {
-        setPedido(response.data.pedido);
+      const response = await fetch(
+        `https://santafe-dashboard.vercel.app/api/pedidos/${id}`
+      );
+      const data = await response.json();
+      if (data.success) {
+        setPedido(data.pedido);
       }
     } catch (error) {
       console.error("Erro ao buscar pedido:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, user]);
+
+  useEffect(() => {
+    loadPedido();
+  }, [loadPedido]);
 
   const getStatusInfo = (status: string) => {
     switch (status) {
@@ -251,11 +253,11 @@ export default function OrderTrackingScreen() {
                   {item.produto.nome}
                 </Text>
                 <Text className="text-gray-600 text-sm">
-                  {item.quantidade}x R$ {item.precoUnitario.toFixed(2)}
+                  {item.quantidade}x R$ {item.precoUnit.toFixed(2)}
                 </Text>
               </View>
               <Text className="text-violet-600 font-bold">
-                R$ {(item.quantidade * item.precoUnitario).toFixed(2)}
+                R$ {(item.quantidade * item.precoUnit).toFixed(2)}
               </Text>
             </View>
           ))}

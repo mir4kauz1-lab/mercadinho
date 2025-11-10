@@ -73,21 +73,11 @@ export default function CheckoutScreen() {
 
       if (data.success) {
         clearCart();
-        Alert.alert(
-          "Sucesso! 🎉",
-          `Pedido realizado com sucesso!\n\nTotal: R$ ${totalComTaxa.toFixed(
-            2
-          )}`,
-          [
-            {
-              text: "Ver Meus Pedidos",
-              onPress: () => router.push("/(account)/orders"),
-            },
-            {
-              text: "OK",
-              onPress: () => router.push("/(tabs)"),
-            },
-          ]
+        // Navega para a página de sucesso com dados do pedido
+        router.push(
+          `/(account)/order-success?orderId=${
+            data.pedido.id
+          }&total=${totalComTaxa.toFixed(2)}`
         );
       } else {
         Alert.alert("Erro", data.message || "Erro ao finalizar pedido");
