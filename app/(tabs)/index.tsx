@@ -9,6 +9,7 @@ import { ProductCardSkeletonGrid } from "@/components/skeletons/product-card-ske
 import { Fonts } from "@/constants/fonts";
 import { categoriasAPI, produtosAPI } from "@/services/api";
 import { storageService } from "@/services/storage";
+import { useUser } from "@/contexts/user-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -46,6 +47,7 @@ interface Categoria {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { logout } = useUser();
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -116,8 +118,17 @@ export default function HomeScreen() {
         text: "Sair",
         style: "destructive",
         onPress: async () => {
-          await storageService.removeCliente();
-          router.replace("../login");
+          try {
+            // Remove do storageService (legado)
+            await storageService.removeCliente();
+            // Remove do UserContext (novo)
+            await logout();
+            // Redireciona para login
+            router.replace("/(auth)/login");
+          } catch (error) {
+            console.error("Erro ao fazer logout:", error);
+            Alert.alert("Erro", "Não foi possível sair. Tente novamente.");
+          }
         },
       },
     ]);

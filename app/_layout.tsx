@@ -106,7 +106,7 @@ export default function RootLayout() {
               options={{ presentation: "modal", title: "Modal" }}
             />
           </Stack>
-          <StatusBar style="light" backgroundColor="#7C3AED" />
+          <StatusBar style="light" />
         </ThemeProvider>
       </CartProvider>
     </UserProvider>

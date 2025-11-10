@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   StyleSheet,
-  StatusBar,
+  SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useUser } from "@/contexts/user-context";
@@ -114,7 +114,6 @@ export default function OrdersScreen() {
   if (!user) {
     return (
       <View style={styles.emptyContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
         <Text style={styles.emptyTitle}>Faça login para ver seus pedidos</Text>
         <Text style={styles.emptySubtitle}>
           Acompanhe todos os seus pedidos em um só lugar
@@ -132,7 +131,6 @@ export default function OrdersScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
         <ActivityIndicator size="large" color="#7C3AED" />
         <Text style={styles.loadingText}>Carregando pedidos...</Text>
       </View>
@@ -140,148 +138,155 @@ export default function OrdersScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#7C3AED" />
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+          >
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Meus Pedidos</Text>
+          <Text style={styles.headerSubtitle}>
+            {pedidos.length} {pedidos.length === 1 ? "pedido" : "pedidos"}
+          </Text>
+        </View>
 
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#7C3AED"
+              colors={["#7C3AED"]}
+            />
+          }
         >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Meus Pedidos</Text>
-        <Text style={styles.headerSubtitle}>
-          {pedidos.length} {pedidos.length === 1 ? "pedido" : "pedidos"}
-        </Text>
-      </View>
-
-      <ScrollView
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#7C3AED"
-            colors={["#7C3AED"]}
-          />
-        }
-      >
-        {pedidos.length === 0 ? (
-          <View style={styles.emptyStateCard}>
-            <Text style={styles.emptyStateIcon}>🛒</Text>
-            <Text style={styles.emptyStateTitle}>Nenhum pedido ainda</Text>
-            <Text style={styles.emptyStateSubtitle}>
-              Comece fazendo seu primeiro pedido!
-            </Text>
-            <TouchableOpacity
-              onPress={() => router.push("/(tabs)")}
-              style={styles.shopButton}
-            >
-              <Text style={styles.shopButtonText}>Começar a Comprar</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.pedidosList}>
-            {pedidos.map((pedido: Pedido) => {
-              const statusColor = getStatusColor(pedido.status);
-              return (
-                <TouchableOpacity
-                  key={pedido.id}
-                  onPress={() =>
-                    router.push(`/(account)/order-tracking?id=${pedido.id}`)
-                  }
-                  style={styles.pedidoCard}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.pedidoHeader}>
-                    <View style={styles.pedidoHeaderLeft}>
-                      <Ionicons
-                        name={getStatusIcon(pedido.status) as any}
-                        size={32}
-                        color={statusColor.text}
-                      />
-                      <View style={styles.pedidoInfo}>
-                        <Text style={styles.pedidoId}>
-                          Pedido #{pedido.id.substring(0, 8)}
-                        </Text>
-                        <Text style={styles.pedidoDate}>
-                          {new Date(pedido.createdAt).toLocaleDateString(
-                            "pt-BR",
-                            {
-                              day: "2-digit",
-                              month: "long",
-                              year: "numeric",
-                            }
-                          )}
+          {pedidos.length === 0 ? (
+            <View style={styles.emptyStateCard}>
+              <Text style={styles.emptyStateIcon}>🛒</Text>
+              <Text style={styles.emptyStateTitle}>Nenhum pedido ainda</Text>
+              <Text style={styles.emptyStateSubtitle}>
+                Comece fazendo seu primeiro pedido!
+              </Text>
+              <TouchableOpacity
+                onPress={() => router.push("/(tabs)")}
+                style={styles.shopButton}
+              >
+                <Text style={styles.shopButtonText}>Começar a Comprar</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.pedidosList}>
+              {pedidos.map((pedido: Pedido) => {
+                const statusColor = getStatusColor(pedido.status);
+                return (
+                  <TouchableOpacity
+                    key={pedido.id}
+                    onPress={() =>
+                      router.push(`/(account)/order-tracking?id=${pedido.id}`)
+                    }
+                    style={styles.pedidoCard}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.pedidoHeader}>
+                      <View style={styles.pedidoHeaderLeft}>
+                        <Ionicons
+                          name={getStatusIcon(pedido.status) as any}
+                          size={32}
+                          color={statusColor.text}
+                        />
+                        <View style={styles.pedidoInfo}>
+                          <Text style={styles.pedidoId}>
+                            Pedido #{pedido.id.substring(0, 8)}
+                          </Text>
+                          <Text style={styles.pedidoDate}>
+                            {new Date(pedido.createdAt).toLocaleDateString(
+                              "pt-BR",
+                              {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              }
+                            )}
+                          </Text>
+                        </View>
+                      </View>
+                      <View
+                        style={[
+                          styles.statusBadge,
+                          { backgroundColor: statusColor.bg },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.statusText,
+                            { color: statusColor.text },
+                          ]}
+                        >
+                          {getStatusTexto(pedido.status)}
                         </Text>
                       </View>
                     </View>
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        { backgroundColor: statusColor.bg },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.statusText, { color: statusColor.text }]}
-                      >
-                        {getStatusTexto(pedido.status)}
-                      </Text>
-                    </View>
-                  </View>
 
-                  <View style={styles.divider} />
+                    <View style={styles.divider} />
 
-                  <View style={styles.pedidoBody}>
-                    <View style={styles.itensContainer}>
-                      {pedido.itens.slice(0, 2).map((item: ItemPedido) => (
-                        <View key={item.id} style={styles.itemRow}>
-                          <Text style={styles.itemQuantity}>
-                            {item.quantidade}x
+                    <View style={styles.pedidoBody}>
+                      <View style={styles.itensContainer}>
+                        {pedido.itens.slice(0, 2).map((item: ItemPedido) => (
+                          <View key={item.id} style={styles.itemRow}>
+                            <Text style={styles.itemQuantity}>
+                              {item.quantidade}x
+                            </Text>
+                            <Text style={styles.itemName} numberOfLines={1}>
+                              {item.produto.nome}
+                            </Text>
+                          </View>
+                        ))}
+                        {pedido.itens.length > 2 && (
+                          <Text style={styles.moreItems}>
+                            +{pedido.itens.length - 2}{" "}
+                            {pedido.itens.length - 2 === 1 ? "item" : "itens"}
                           </Text>
-                          <Text style={styles.itemName} numberOfLines={1}>
-                            {item.produto.nome}
-                          </Text>
-                        </View>
-                      ))}
-                      {pedido.itens.length > 2 && (
-                        <Text style={styles.moreItems}>
-                          +{pedido.itens.length - 2}{" "}
-                          {pedido.itens.length - 2 === 1 ? "item" : "itens"}
+                        )}
+                      </View>
+
+                      <View style={styles.pedidoFooter}>
+                        <Text style={styles.totalLabel}>Total</Text>
+                        <Text style={styles.totalValue}>
+                          R$ {pedido.total.toFixed(2)}
                         </Text>
-                      )}
-                    </View>
+                      </View>
 
-                    <View style={styles.pedidoFooter}>
-                      <Text style={styles.totalLabel}>Total</Text>
-                      <Text style={styles.totalValue}>
-                        R$ {pedido.total.toFixed(2)}
-                      </Text>
+                      <View style={styles.viewDetails}>
+                        <Text style={styles.viewDetailsText}>Ver detalhes</Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={20}
+                          color="#7C3AED"
+                        />
+                      </View>
                     </View>
-
-                    <View style={styles.viewDetails}>
-                      <Text style={styles.viewDetailsText}>Ver detalhes</Text>
-                      <Ionicons
-                        name="chevron-forward"
-                        size={20}
-                        color="#7C3AED"
-                      />
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
-      </ScrollView>
-    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#7C3AED",
+  },
   container: {
     flex: 1,
     backgroundColor: "#F9FAFB",
@@ -330,7 +335,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: "#7C3AED",
-    paddingTop: 64,
+    paddingTop: 16,
     paddingBottom: 32,
     paddingHorizontal: 24,
   },
